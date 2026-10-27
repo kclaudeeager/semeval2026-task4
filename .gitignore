@@ -4,11 +4,9 @@ data/interim/*
 data/processed/*
 !data/**/.gitkeep
 
-# run outputs
+# run outputs: Hydra working dirs are disposable, results are evidence and are kept
 outputs/
 multirun/
-reports/results/*.json
-!reports/results/.gitkeep
 
 # python
 __pycache__/
