@@ -1,0 +1,6 @@
+name: l3_characters
+params:
+  model_name: sapienzanlp/maverick-mes-litbank   # keeps singletons
+  alpha: 0.5          # mention-string vs context weight
+  context_window: 10
+  min_mentions: 1

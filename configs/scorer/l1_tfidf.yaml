@@ -1,0 +1,6 @@
+name: l1_tfidf
+params:
+  ngram_max: 2
+  min_df: 2
+  sublinear_tf: true
+  stop_words: english

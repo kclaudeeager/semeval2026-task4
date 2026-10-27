@@ -1,0 +1,185 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[top=0.55in,bottom=0.45in,left=0.65in,right=0.65in]{geometry}
+\raggedbottom
+\usepackage{times}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{3pt}{1pt}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.5em}{}
+\setlist[enumerate]{leftmargin=1.3em,topsep=1pt,itemsep=1pt,parsep=0pt}
+\pagestyle{empty}
+
+\title{\vspace{-3em}\textbf{Course Project Proposal}\\[1pt]
+\normalsize SemEval-2026 Task 4: Narrative Story Similarity and Narrative Representation Learning}
+\author{Claude Kwizera \\ \small CS 421: Natural Language Processing}
+\date{\small October 16, 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\vspace{-3em}
+
+\section{Task Selection}
+
+This project enters SemEval-2026 Task 4 \cite{hatzel2026}, Track A.
+
+The task gives the system three story summaries, an anchor and two candidates, and asks which candidate is
+narratively closer to the anchor. The guidelines define ``closer'' along three aspects: course of
+action, outcomes, and abstract theme. Annotators record which aspect drove each decision, and those records
+become the diagnostic in Section~\ref{sec:approach}.
+
+Only Track A is in scope. Track B asks for one vector per story, and the organisers compare those vectors
+afterwards on triples the system never sees, so nothing can be encoded knowing which stories it will meet. That
+rewards a general-purpose embedding. Track A shows both candidates at once, which rewards a comparator, and the
+approach in Section~\ref{sec:approach} scores one story's cast against another's, so it needs both stories in hand.
+
+How the data was built explains most of what follows. Summaries come from \emph{Tell Me Again}
+\cite{tellmeagain}, cut to four to eight sentences, with a GPT-4o-mini filter that drops texts giving only a
+premise. Each anchor is then sampled at random, and both candidates are drawn relative to it under
+\texttt{story-emb} \cite{storyemb}, an encoder trained so that different summaries of one story land close
+together: the nearest story is the assumed answer and the distractor comes from the 98th to 99th similarity
+percentile, so both candidates sit close to the anchor. Two commercial LLMs then judge each triple, and only the
+triples they disagree on are annotated. Of 1,237 such triples, 831 had two annotators agree and a third
+annotation settled 208 more; the rest were dropped, leaving 1,039. Shallow cues are correspondingly weak: a
+Jaccard baseline scores 45.0\% on dev, below the 50\% chance line, and 58.0\% on test, and TF--IDF cosine
+scores 49.0\% and 58.25\%, against 78.00 for the best submitted system.
+
+What might close that gap is structure: who does what to whom, which two retellings of one plot keep even when
+they share few words. Prior work divides on which kind of structure. Event structure has not yet produced gains
+here. The organisers trained narrative chain embeddings \cite{hatzel2023,chambers2008}, reached state of the art
+on narrative cloze, the task of predicting a held-out event, and then reported that the representations ``perform
+poorly at identifying narratively similar texts.'' In the shared task, StoryNet's symbolic narrative graphs
+finished 43rd of 47 runs \cite{storynet}, and the winning team tried Propp's functions, a fixed inventory of
+folktale plot roles, three times before dropping them \cite{cognac}. A related negative result holds more
+generally: adding syntactic structure to a strong pretrained encoder has a ``limited and inconsistent'' effect on
+language understanding tasks \cite{glavas2021}.
+
+Character structure has produced gains, though on neighbouring tasks rather than on this one. Chaturvedi et al.\
+\cite{chaturvedi2018} matched movie remakes. Their event-based model scored worse than bag-of-words on its own;
+what helped was matching characters across the two stories, using agent and patient features from the dependency
+parse, which raised precision at rank 1 from 0.558 to 0.637. They never resolved coreference, and they name
+missed coreference as a source of error. Barancov\'a and Sileno \cite{barancova2026} add coreference-derived
+character roles to dense embeddings and gain 14.6\% relative in retrieval accuracy over \emph{Tell Me Again}
+($p<0.001$, four encoders). Neither tested parse-derived roles on triples filtered to defeat model agreement.
+Whether that signal transfers to this harder setting is the hypothesis under test, and the project is built to
+answer it either way.
+
+\section{Official Metric}
+
+Accuracy on the binary choice, and nothing else. The organisers report a human upper bound near 89\%
+\cite{hatzel2026}, so the winning 78.00\% falls 11 points short of people rather than 22 points short of perfect.
+They also report Krippendorff's $\alpha$ of 0.33 overall and 0.05 to 0.11 per aspect. Low agreement caps what any
+system can reach and makes the per-aspect strata noisy, and 400 test items make a two-point difference unreliable
+on its own. Both push Section~\ref{sec:approach} towards paired tests.
+
+\section{Official Results}
+
+\begin{center}
+\small\begin{tabular}{lcc}
+\toprule
+& \textbf{Track A} & \textbf{Track B} \\
+\midrule
+Best system (COGNAC) & \textbf{78.00} & \textbf{72.00} \\
+Strongest baseline & 67.00 \scriptsize GPT-4o-mini & 66.75 \scriptsize \texttt{e5} \\
+Range, mean (ranked systems) & 53.50--78.00, 66.51 (44) & 54.50--72.00, 63.83 (27) \\
+Human upper bound & \multicolumn{2}{c}{$\approx 89$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Forty-six teams sent 71 submissions \cite{hatzel2026}. Figures above are from the overview and system papers
+\cite{hatzel2026,cognac,e5}; the two means are computed here, and the range covers ranked systems only,
+so the baselines sit outside it. The strongest Track A baseline is a single zero-shot GPT-4o-mini prompt at
+67.00, about 22nd of 44: beating it is easy, beating the field is not.
+
+\section{Data Access}
+
+The data downloaded with no trouble: public on GitHub, no sign-up and no licence form
+(\url{https://github.com/narrative-similarity-task/narrative-similarity-dataset}). Track A has 39 sample, 200 dev
+and 400 test triples; Track B has 849 test stories. Summaries and labels are CC BY-SA 4.0, labels also CC0.
+
+Three properties of the release shape the plan. First, no training split is provided at all, so there is no
+fine-tuning: the approach is feature engineering with cross-validation on the labelled splits. Second, the gold
+test labels are public, which allows rebuilding the leaderboard offline without CodaBench but makes overfitting
+easy; one team was disqualified for exactly that \cite{hatzel2026}. I have run the lexical baselines on test
+once, to check the scorer against the published figures; from here the test set is closed until a single final
+run. Third, the
+splits share stories even where they share no triple: the Track A and Track B test sets have 265 stories in
+common, and 190 of the 848 Track A test stories appear in dev or sample. Features tuned on dev
+can therefore see test stories, so L5 is reported in dev-tuned and dev-free variants.
+
+\section{Planned Approach}\label{sec:approach}
+
+Each layer adds one representation and tests one step of the argument above. \textbf{L0} is random and
+Jaccard, which reproduce the published baselines; this implementation scores 58.0\% on test against the published
+56.25\%, a seven-item difference attributable to tokenisation and to be reconciled first.
+\textbf{L1} is TF--IDF cosine, which measures how much of the task is word overlap. \textbf{L2} is sentence
+embeddings (\texttt{e5} \cite{e5}); the organisers publish no Track A figure for it, so L2 establishes one.
+\textbf{L3} adds characters: coreference chains from \texttt{maverick-coref} \cite{maverick,jm3} give each story
+its cast, and story similarity is the score of the best one-to-one matching between the two casts, computed with
+the Hungarian algorithm over mention-string and context similarity. \textbf{L4} adds roles: for each character, the verb
+lemmas where it is the syntactic subject act as an agent proxy and those where it is the object as a patient
+proxy \cite[Chapter~22]{jm3}, and the matching is scored on shared role--lemma pairs instead of mentions. \textbf{L5}
+combines L2 with the L3 and L4 scores, weights fitted by cross-validation. Each layer scores the anchor against
+both candidates and picks the higher.
+
+No maintained PropBank SRL system exists (AllenNLP was archived in 2022, and SRL by LLM prompt reaches 48.6\%
+argument match against 88.3\% for humans \cite{bonn2024}), so L4 uses dependency proxies, as Chaturvedi et al.\
+did \cite{chaturvedi2018}.
+
+A first attempt at the per-aspect diagnostic is why the statistics below are strict. Splitting test by
+course of action, TF--IDF scores 62.4\% on the 186 items annotators did not mark and 54.7\% on the 214 they did.
+The same split on dev reverses, 44.3\% against 53.4\%, and neither gap is significant ($z=1.56$, $p=0.12$;
+$z=-1.28$, $p=0.20$). The instability has an identifiable cause: with two annotators, ``did not mark'' pools 31
+test items that neither annotator marked with 136 where one of the two did. The diagnostic will therefore use
+unanimous strata only, and will use outcomes rather than course of action, where the clean strata hold 79 and 133
+items rather than 188 and 32. Abstract theme is unusable for this purpose: every annotator marked it on 392 of
+the 400 test items.
+
+Evaluation is official accuracy against the gold labels. Bootstrap confidence intervals \cite[Section~4.11.1]{jm3}
+describe a single system; two systems are compared with McNemar's test on the same items \cite{dietterich},
+since at these sample sizes overlapping intervals would hide real differences. Model selection
+is cross-validation over dev plus sample (239 items), with configurations capped in advance.
+
+L0 to L2 need no training and L3 and L4 only run pretrained models, so Colab Pro is enough and no paid API is needed
+before November 25. The project is in English.
+
+\section{Failure Cases and Mitigations}
+
+\begin{enumerate}[label=\textbf{F\arabic*.}]
+\item The character and role features add nothing over the embeddings. This is the most likely outcome, and there
+is precedent \cite{hatzel2023,glavas2021,chaturvedi2018}. The ablation makes that a reportable result, and the
+diagnostic says in which stratum the signal is absent.
+\item Coreference is unreliable on summaries this short, and coreference scores have been shown not to predict
+downstream gains in at least one other domain \cite{chai2022}. I will check 50 items by hand early, report the
+error rate, and use the singleton-keeping LitBank model \cite{maverick}.
+\item A gain turns out to be noise, as the stratified result above already was. Guards: McNemar's test,
+bootstrap intervals on both splits, capped configurations, one clean test run.
+\item Recent work overlaps \cite{barancova2026}: it ranks unfiltered summaries with LLM-assigned roles, where
+this project classifies filtered triples with parse-derived roles.
+\end{enumerate}
+
+\newpage
+\begin{thebibliography}{99}
+\footnotesize\setlength{\itemsep}{0pt}
+\bibitem{hatzel2026} Hans Ole Hatzel, Ekaterina Artemova, Haimo Stiemer, Evelyn Gius, and Chris Biemann. SemEval-2026 Task 4: Narrative Story Similarity and Narrative Representation Learning. \emph{SemEval-2026}, 3460--3478. \url{https://aclanthology.org/2026.semeval-1.429/}
+\bibitem{cognac} Tisa Islam Erana, Azwad Anjum Islam, Anshu Kiran Sharma, and Mark A. Finlayson. COGNAC at SemEval-2026 Task 4: Evaluating Narrative Components with LLMs for Hard Story Similarity Cases. \emph{SemEval-2026}, 2290--2300. \url{https://aclanthology.org/2026.semeval-1.290/}
+\bibitem{storynet} Amol Vijayachandran, Ananth Rajesh, Siddharth Mago, Maitreya Prafulla Chitale, and Aparajitha Allamraju. IIITH Boys at SemEval-2026 Task 4: StoryNet---Understanding Narrative Story Similarity through Symbolic Representations. \emph{SemEval-2026}, 3382--3393. \url{https://aclanthology.org/2026.semeval-1.420/}
+\bibitem{chaturvedi2018} Snigdha Chaturvedi, Shashank Srivastava, and Dan Roth. Where Have I Heard This Story Before? Identifying Narrative Similarity in Movie Remakes. \emph{NAACL-HLT 2018}, 673--678. \url{https://aclanthology.org/N18-2106/}
+\bibitem{hatzel2023} Hans Ole Hatzel and Chris Biemann. Narrative Cloze as a Training Objective: Towards Modeling Stories Using Narrative Chain Embeddings. \emph{5th Workshop on Narrative Understanding}, 118--127. \url{https://aclanthology.org/2023.wnu-1.19/}
+\bibitem{barancova2026} Alexandra Barancov\'a and Giovanni Sileno. Narrative Similarity Detection Using Character Roles. \emph{Text2Story'26 Workshop}, CEUR-WS Vol-4202. \url{https://ceur-ws.org/Vol-4202/paper6.pdf}
+\bibitem{chambers2008} Nathanael Chambers and Dan Jurafsky. Unsupervised Learning of Narrative Event Chains. \emph{ACL-08: HLT}, 789--797. \url{https://aclanthology.org/P08-1090/}
+\bibitem{tellmeagain} Hans Ole Hatzel and Chris Biemann. Tell Me Again! a Large-Scale Dataset of Multiple Summaries for the Same Story. \emph{LREC-COLING 2024}, 15732--15741. \url{https://aclanthology.org/2024.lrec-main.1366/}
+\bibitem{storyemb} Hans Ole Hatzel and Chris Biemann. Story Embeddings---Narrative-Focused Representations of Fictional Stories. \emph{EMNLP 2024}, 5931--5943. \url{https://aclanthology.org/2024.emnlp-main.339/}
+\bibitem{e5} Liang Wang, Nan Yang, Xiaolong Huang, Binxing Jiao, Linjun Yang, Daxin Jiang, Rangan Majumder, and Furu Wei. Text Embeddings by Weakly-Supervised Contrastive Pre-training. arXiv:2212.03533, 2022.
+\bibitem{maverick} Giuliano Martinelli, Edoardo Barba, and Roberto Navigli. Maverick: Efficient and Accurate Coreference Resolution Defying Recent Trends. \emph{ACL 2024}, 13380--13394. \url{https://aclanthology.org/2024.acl-long.722/}
+\bibitem{glavas2021} Goran Glava\v{s} and Ivan Vuli\'c. Is Supervised Syntactic Parsing Beneficial for Language Understanding Tasks? An Empirical Investigation. \emph{EACL 2021}, 3090--3104. \url{https://aclanthology.org/2021.eacl-main.270/}
+\bibitem{chai2022} Haixia Chai, Nafise Sadat Moosavi, Iryna Gurevych, and Michael Strube. Evaluating Coreference Resolvers on Community-based Question Answering: From Rule-based to State of the Art. \emph{CRAC 2022}, 61--73. \url{https://aclanthology.org/2022.crac-1.7/}
+\bibitem{bonn2024} Julia Bonn, Harish Tayyar Madabushi, Jena D. Hwang, and Claire Bonial. Adjudicating LLMs as PropBank Annotators. \emph{DMR 2024 @ LREC-COLING}, 112--123. \url{https://aclanthology.org/2024.dmr-1.12/}
+\bibitem{jm3} Daniel Jurafsky and James H. Martin. \emph{Speech and Language Processing}, 3rd ed. Online manuscript released August 19, 2026. \url{https://web.stanford.edu/~jurafsky/slp3/}
+\bibitem{dietterich} Thomas G. Dietterich. Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms. \emph{Neural Computation} 10(7):1895--1923, 1998.
+\end{thebibliography}
+
+\end{document}

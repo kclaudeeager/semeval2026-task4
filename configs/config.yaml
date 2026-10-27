@@ -1,0 +1,16 @@
+# Root config. Every run is a composition of these groups, so a comparison is a
+# config diff rather than an edited script.
+defaults:
+  - scorer: l0_jaccard
+  - data: dev
+  - eval: default
+  - _self_
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${scorer.name}_${data.split}_${now:%H%M%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d_%H%M%S}
+    subdir: ${scorer.name}
+  job:
+    chdir: false

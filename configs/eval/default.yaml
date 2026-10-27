@@ -1,0 +1,7 @@
+n_boot: 2000
+seed: 0
+aspects: [outcomes, course_of_actions]
+out_dir: reports/results
+# Guard on the single held-out run promised in the proposal.
+allow_test: false
+compare_against: null

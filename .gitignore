@@ -1,0 +1,24 @@
+# data: never committed, regenerate with scripts/fetch_data.sh
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+
+# run outputs
+outputs/
+multirun/
+reports/results/*.json
+!reports/results/.gitkeep
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# os / editor
+.DS_Store
+*.swp

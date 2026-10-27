@@ -1,0 +1,5 @@
+name: l5_combined
+params:
+  components: [l2_e5, l3_characters, l4_roles]
+  weights: null       # null => fitted by grid search on data.fit_split
+  grid_step: 0.1

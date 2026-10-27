@@ -1,0 +1,6 @@
+# @package _global_
+# The per-aspect diagnostic on unanimous strata, paired against the L2 backbone.
+defaults:
+  - override /scorer: l4_roles
+  - override /data: dev
+  - override /eval: diagnostic

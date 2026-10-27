@@ -1,0 +1,4 @@
+root: data/raw/narrative-similarity-dataset
+split: dev
+# Document frequencies and L5 weights are fitted here, never on test.
+fit_split: dev

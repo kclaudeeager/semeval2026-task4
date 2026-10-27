@@ -1,0 +1,5 @@
+name: l2_e5
+params:
+  model_name: intfloat/e5-base-v2
+  prefix: "query: "
+  batch_size: 32

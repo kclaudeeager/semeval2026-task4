@@ -1,0 +1,7 @@
+n_boot: 5000
+seed: 0
+# Only `outcomes` has two usable unanimous strata (79 / 133 on test).
+aspects: [outcomes]
+out_dir: reports/results
+allow_test: false
+compare_against: l2_e5

@@ -1,0 +1,11 @@
+# @package _global_
+# Sweep every layer across dev: `python -m task4.cli --multirun experiment=ablation`
+defaults:
+  - override /data: dev
+  - override /eval: default
+
+hydra:
+  mode: MULTIRUN
+  sweeper:
+    params:
+      scorer: l0_random,l0_jaccard,l1_tfidf,l2_e5,l3_characters,l4_roles,l5_combined

@@ -1,0 +1,4 @@
+root: data/raw/narrative-similarity-dataset
+split: test
+# Fit on dev so the held-out run stays honest.
+fit_split: dev

@@ -1,0 +1,7 @@
+name: l4_roles
+params:
+  model_name: sapienzanlp/maverick-mes-litbank
+  spacy_model: en_core_web_sm
+  alpha: 0.5
+  agent_weight: 0.5   # agent verbs vs patient verbs
+  role_weight: 0.7    # role overlap vs mention overlap

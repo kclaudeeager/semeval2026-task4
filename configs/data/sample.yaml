@@ -1,0 +1,3 @@
+root: data/raw/narrative-similarity-dataset
+split: sample
+fit_split: sample
