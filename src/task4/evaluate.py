@@ -26,6 +26,7 @@ class Result:
     strata: dict = field(default_factory=dict)
     meta: dict = field(default_factory=dict)
     correct: list[bool] = field(default_factory=list)
+    fitted: dict = field(default_factory=dict)
 
 
 def _git_sha() -> str:
@@ -70,6 +71,7 @@ def evaluate(scorer: Scorer, triples: list[Triple], split: str,
         strata[aspect] = block
 
     return Result(
+        fitted=scorer.fitted_params(),
         scorer=scorer.name, split=split, n=len(correct),
         accuracy=boot.point, ci_low=boot.lo, ci_high=boot.hi,
         wilson_low=wil.lo, wilson_high=wil.hi, strata=strata,
@@ -78,6 +80,56 @@ def evaluate(scorer: Scorer, triples: list[Triple], split: str,
               "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"), "seed": seed,
               "n_boot": n_boot},
     )
+
+
+def evaluate_cv(factory, triples: list[Triple], split: str, k: int = 5,
+                seed: int = 0, **kwargs) -> Result:
+    """K-fold evaluation for layers whose fit() learns parameters.
+
+    Fitting weights on a split and scoring the same split is circular: the
+    estimate is optimistic by construction. Here each fold is predicted by a
+    scorer fitted on the other folds, so no item contributes to the parameters
+    used to score it. `factory` returns a fresh, unfitted scorer.
+    """
+    import random
+
+    labelled = [t for t in triples if t.a_is_closer is not None]
+    idx = list(range(len(labelled)))
+    random.Random(seed).shuffle(idx)
+    folds = [idx[i::k] for i in range(k)]
+
+    preds: dict[int, bool] = {}
+    per_fold: list[dict] = []
+    for f in range(k):
+        held = set(folds[f])
+        train = [labelled[i] for i in idx if i not in held]
+        test_rows = [labelled[i] for i in folds[f]]
+        model = factory()
+        model.fit(train)
+        for i, p in zip(folds[f], model.predict(test_rows)):
+            preds[i] = p
+        per_fold.append(model.fitted_params())
+
+    ordered = [preds[i] for i in range(len(labelled))]
+    frozen = _Frozen(factory().name, ordered)
+    out = evaluate(frozen, labelled, split, **kwargs)
+    out.meta["cv_folds"] = k
+    out.fitted = {"per_fold": per_fold}
+    return out
+
+
+class _Frozen(Scorer):
+    """Replays precomputed predictions so cross-validated runs reuse the harness."""
+
+    def __init__(self, name: str, preds: list[bool]):
+        self.name = name
+        self._preds = preds
+
+    def score(self, anchor: str, candidate: str) -> float:  # pragma: no cover
+        raise NotImplementedError("frozen predictions carry no score function")
+
+    def predict(self, triples: list[Triple]) -> list[bool]:
+        return list(self._preds)
 
 
 def compare(a: Result, b: Result) -> dict:

@@ -39,6 +39,8 @@ class JaccardScorer(Scorer):
 class TfidfScorer(Scorer):
     """TF-IDF cosine. Document frequencies come from fit(), never from the test split."""
 
+    fits_parameters = True
+
     def __init__(self, ngram_max: int = 2, min_df: int = 2, sublinear_tf: bool = True,
                  stop_words: str | None = "english"):
         self.ngram_max = ngram_max

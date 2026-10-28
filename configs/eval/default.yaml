@@ -5,3 +5,6 @@ out_dir: reports/results
 # Guard on the single held-out run promised in the proposal.
 allow_test: false
 compare_against: null
+# Layers that fit parameters (L5) are cross-validated when the fitting split and
+# the evaluation split are the same, so the estimate is not circular. 0 disables.
+cv_folds: 5

@@ -40,3 +40,38 @@ def test_compare_requires_the_same_items():
     except ValueError:
         return
     raise AssertionError("expected ValueError on mismatched item counts")
+
+
+def test_cross_validation_never_scores_an_item_with_its_own_fold():
+    """The point of evaluate_cv: no item influences the parameters used on it."""
+    from task4.evaluate import evaluate_cv
+
+    seen: list[set[int]] = []
+
+    class Spy(JaccardScorer):
+        fits_parameters = True
+
+        def fit(self, triples):
+            seen.append({id(t) for t in triples})
+            return self
+
+    rows = _rows(40)
+    evaluate_cv(Spy, rows, "dev", k=4, n_boot=50)
+    assert len(seen) == 4
+    for train in seen:
+        assert len(train) == 30          # each fold trains on the other three
+
+
+def test_stateless_layers_are_not_marked_for_cross_validation():
+    from task4.scorers.lexical import JaccardScorer, RandomScorer, TfidfScorer
+    from task4.scorers.combined import CombinedScorer
+
+    assert RandomScorer().fits_parameters is False
+    assert JaccardScorer().fits_parameters is False
+    assert TfidfScorer().fits_parameters is True
+    assert CombinedScorer.fits_parameters is True
+
+
+def test_fitted_parameters_are_recorded_in_the_result():
+    r = evaluate(JaccardScorer(), _rows(), "dev", n_boot=50)
+    assert r.fitted == {}

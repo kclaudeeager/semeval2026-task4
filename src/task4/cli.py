@@ -6,7 +6,7 @@ from pathlib import Path
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
-from .evaluate import compare, evaluate, load_split, save
+from .evaluate import compare, evaluate, evaluate_cv, load_split, save
 from .registry import build
 
 log = logging.getLogger(__name__)
@@ -17,11 +17,21 @@ def _run_one(cfg: DictConfig, name: str, params: dict):
     triples = load_split(root, cfg.data.split)
     fit_on = load_split(root, cfg.data.fit_split) if cfg.data.get("fit_split") else triples
 
-    scorer = build(name, **params)
-    scorer.fit(fit_on)
-    result = evaluate(scorer, triples, cfg.data.split,
-                      n_boot=cfg.eval.n_boot, seed=cfg.eval.seed,
-                      aspects=tuple(cfg.eval.aspects))
+    k = int(cfg.eval.get("cv_folds") or 0)
+    circular = cfg.data.get("fit_split") == cfg.data.split
+    learns = build(name, **params).fits_parameters
+    if k and circular and learns:
+        # Fitting and scoring the same split would flatter the result.
+        result = evaluate_cv(lambda: build(name, **params), triples, cfg.data.split,
+                             k=k, seed=cfg.eval.seed, n_boot=cfg.eval.n_boot,
+                             aspects=tuple(cfg.eval.aspects))
+        log.info("cross-validated over %d folds (fit split == eval split)", k)
+    else:
+        scorer = build(name, **params)
+        scorer.fit(fit_on)
+        result = evaluate(scorer, triples, cfg.data.split,
+                          n_boot=cfg.eval.n_boot, seed=cfg.eval.seed,
+                          aspects=tuple(cfg.eval.aspects))
     out = Path(hydra.utils.get_original_cwd()) / cfg.eval.out_dir
     path = save(result, out, OmegaConf.to_container(cfg, resolve=True))
     log.info("%-16s %-5s n=%-4d acc=%.2f%% CI [%.2f, %.2f] -> %s",

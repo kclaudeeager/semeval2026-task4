@@ -14,6 +14,8 @@ class CombinedScorer(Scorer):
     the split passed to fit(). Fitting never sees the test split.
     """
 
+    fits_parameters = True
+
     def __init__(self, components: list[str] | None = None,
                  weights: list[float] | None = None, grid_step: float = 0.1):
         self.component_names = components or ["l2_e5", "l3_characters", "l4_roles"]
@@ -56,6 +58,10 @@ class CombinedScorer(Scorer):
                     best, best_acc = combo, hits
             self.weights = list(best) if best else [1.0] + [0.0] * (len(self._components) - 1)
         return self
+
+    def fitted_params(self) -> dict:
+        return {"components": self.component_names,
+                "weights": [round(float(w), 4) for w in (self.weights or [])]}
 
     def score(self, anchor: str, candidate: str) -> float:
         if not self._stats:

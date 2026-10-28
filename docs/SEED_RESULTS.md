@@ -160,3 +160,64 @@ combination of L2 + L3n + L4n. Given the error correlations, expect it to land
 at or just above L2 alone. Run it anyway: "the combination does not beat its
 strongest component" is a reportable result, and it is the experiment the
 proposal promised.
+
+---
+
+# Update 2, 28 October: the combination adds nothing
+
+`l5n_combined_nocoref` — L2 + L3n + L4n, weights fitted by grid search — scored
+**59.00%** on dev against L2's 58.50%.
+
+| | dev |
+|---|---|
+| L5 fitted combination | 59.00 |
+| L2 alone | 58.50 |
+| delta | **+0.50** |
+
+Paired: it fixes 22 items and breaks 21. **p = 1.000.**
+
+That is the proposal's central experiment, and the answer is no. Worse than the
+size of the gap is the condition it was measured under: the weights were fitted
+on dev and scored on dev. Given the most favourable setup available — allowed to
+tune on the very items it was graded on — the combination could not beat its
+strongest component by more than a single item.
+
+## Two faults this exposed
+
+**The fitted weights were never recorded.** `weights: null` went into the config
+and nothing came out. The most informative number a combiner run produces — what
+it decided L3n and L4n were worth — was discarded. `Scorer.fitted_params()` now
+returns what `fit()` learned and it lands in the result JSON.
+
+**Fitting and scoring the same split is circular.** Any layer that learns
+parameters is now cross-validated over 5 folds when the fitting split and the
+evaluation split coincide, so no item contributes to the parameters used to
+score it. The correction is real: TF-IDF drops from **51.50 to 50.50** under
+cross-validation. Stateless layers are exempt by a `fits_parameters` flag —
+re-fitting a seeded random baseline per fold would move its number without
+making it more honest.
+
+Re-run L5 to get its cross-validated figure, which is the one for the report:
+
+```bash
+python -m task4.cli scorer=l5n_combined_nocoref data=dev
+```
+
+Expect it at or below 58.50, and expect the fitted weights to be worth reading.
+
+## Where the project stands
+
+Every result points the same way, and the proposal anticipated this outcome:
+
+| finding | reading |
+|---|---|
+| Filtering to real characters costs 4.5 pts | the signal is not character-specific |
+| No structural layer beats L2 | structure adds nothing over embeddings |
+| Union 86.5% vs 96.0% expected under independence | the layers fail on the same items |
+| L3n/L4n error correlation +0.446 | the two structural layers are near-redundant |
+| Fitted combination +0.50, p = 1.000, fitted on its own test | combining does not help |
+
+Coreference is still untested and remains the one component that could change
+this. It should be run. But the report should be written around the negative
+result that five independent measurements now support, with coreference as the
+final test of it rather than the hoped-for rescue.

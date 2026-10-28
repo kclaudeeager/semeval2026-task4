@@ -23,7 +23,7 @@
       },
       "contrast": {
         "z": 0.7523723784438182,
-        "p_value": 0.4518271525749514,
+        "p_value": 0.45182715257495126,
         "diff": 7.429577464788734,
         "note": "unpaired across disjoint strata: suggestive, not a system comparison"
       }
@@ -43,16 +43,16 @@
       },
       "contrast": {
         "z": 1.72596427436467,
-        "p_value": 0.08435384013932679,
+        "p_value": 0.08435384013932677,
         "diff": 21.830143540669855,
         "note": "unpaired across disjoint strata: suggestive, not a system comparison"
       }
     }
   },
   "meta": {
-    "git_sha": "acf1003",
-    "python": "3.12.12",
-    "timestamp": "2026-10-27T21:07:58",
+    "git_sha": "ed7d0f6",
+    "python": "3.10.12",
+    "timestamp": "2026-10-28T02:44:17",
     "seed": 0,
     "n_boot": 2000
   },
@@ -258,6 +258,7 @@
     false,
     false
   ],
+  "fitted": {},
   "config": {
     "scorer": {
       "name": "l0_random",
@@ -279,7 +280,8 @@
       ],
       "out_dir": "reports/results",
       "allow_test": false,
-      "compare_against": null
+      "compare_against": null,
+      "cv_folds": 5
     }
   },
   "params_tag": "843f5ee4"

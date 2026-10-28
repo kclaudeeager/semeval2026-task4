@@ -8,3 +8,4 @@ allow_test: false
 # Until the embeddings extra is installed, pair against the strongest layer that
 # runs without a download. Switch to l2_e5 as soon as it is available.
 compare_against: l1_tfidf
+cv_folds: 5
