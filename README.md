@@ -17,7 +17,7 @@ make setup                                   # venv outside OneDrive + install
 make data                                    # unpack the release into data/raw
 make test                                    # 24 tests, no network needed
 python -m task4.cli scorer=l1_tfidf data=dev # one layer, one split
-make ablation                                # every layer, swept over dev
+make ablation                                # every runnable layer, swept over dev
 ```
 
 Adding a variant is a new YAML file in `configs/scorer/`, optionally with a new
@@ -30,7 +30,9 @@ changes, so two runs are always comparable.
 |---|---|---|
 | L0 | `l0_random`, `l0_jaccard` | chance and token overlap; reproduces the published baselines |
 | L1 | `l1_tfidf` | how much of the task is lexical overlap |
-| L2 | `l2_e5` | dense sentence embeddings — the backbone |
+| L2 | `l2_e5` | dense sentence embeddings — the backbone *(needs `[embeddings]`)* |
+| L3n | `l3n_characters_nocoref` | characters from surface mentions, no coreference |
+| L4n | `l4n_roles_nocoref` | roles from the parse, no coreference *(needs spaCy only)* |
 | L3 | `l3_characters` | coreference chains, casts aligned one-to-one (Hungarian) |
 | L4 | `l4_roles` | agent/patient verb lemmas from the dependency parse |
 | L5 | `l5_combined` | weighted blend of L2–L4, weights fitted by cross-validation |
@@ -78,6 +80,13 @@ notebooks/    01_walkthrough.ipynb — every module explained and run
 | `l0_jaccard` | 45.00 | 58.00 | 56.25 |
 | `l0_random` | 46.00 | — | 50.00 |
 | `l1_tfidf` | 51.50 | — | — |
+| `l3n_characters_nocoref` (all noun chunks) | 57.00 | — | — |
+| `l3n_characters_nocoref` (actors only) | 52.50 | — | — |
+| `l4n_roles_nocoref` | 53.50 | — | — |
+
+Narrowing the cast to things that behave like characters *costs* 4.5 points,
+which points away from character structure and towards noun-phrase overlap.
+See `docs/SEED_RESULTS.md`.
 
 Jaccard reproduces the published figure to within seven items on test. The dev
 Jaccard figure of 45.00 sits below the 50% chance line, which is what the

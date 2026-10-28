@@ -1,5 +1,8 @@
 # @package _global_
-# Sweep every layer across dev: `python -m task4.cli --multirun experiment=ablation`
+# Every layer that can run without a HuggingFace download, swept over dev:
+#   make ablation
+# Add l2_e5, l3_characters, l4_roles and l5_combined to the list below once
+# `uv pip install -e ".[embeddings,structure]"` has fetched the models.
 defaults:
   - override /data: dev
   - override /eval: default
@@ -8,4 +11,4 @@ hydra:
   mode: MULTIRUN
   sweeper:
     params:
-      scorer: l0_random,l0_jaccard,l1_tfidf,l2_e5,l3_characters,l4_roles,l5_combined
+      scorer: l0_random,l0_jaccard,l1_tfidf,l3n_characters_nocoref,l4n_roles_nocoref

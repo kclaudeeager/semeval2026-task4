@@ -4,4 +4,7 @@ seed: 0
 aspects: [outcomes]
 out_dir: reports/results
 allow_test: false
-compare_against: l2_e5
+# The proposal pairs the structural layers against the L2 embedding backbone.
+# Until the embeddings extra is installed, pair against the strongest layer that
+# runs without a download. Switch to l2_e5 as soon as it is available.
+compare_against: l1_tfidf

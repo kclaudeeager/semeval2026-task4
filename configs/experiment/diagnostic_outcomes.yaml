@@ -1,6 +1,10 @@
 # @package _global_
-# The per-aspect diagnostic on unanimous strata, paired against the L2 backbone.
+# The per-aspect diagnostic on unanimous strata, paired against the backbone.
+#
+# Read docs/POWER.md before interpreting the output: the per-stratum numbers are
+# descriptive. The 79- and 133-item strata cannot support a significance claim,
+# so the confirmatory comparison is the paired test over all items.
 defaults:
-  - override /scorer: l4_roles
+  - override /scorer: l4n_roles_nocoref
   - override /data: dev
   - override /eval: diagnostic

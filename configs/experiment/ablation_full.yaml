@@ -1,0 +1,12 @@
+# @package _global_
+# The complete ablation, including the layers that need model downloads:
+#   python -m task4.cli --multirun experiment=ablation_full
+defaults:
+  - override /data: dev
+  - override /eval: default
+
+hydra:
+  mode: MULTIRUN
+  sweeper:
+    params:
+      scorer: l0_random,l0_jaccard,l1_tfidf,l2_e5,l3n_characters_nocoref,l4n_roles_nocoref,l3_characters,l4_roles,l5_combined

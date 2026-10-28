@@ -50,9 +50,9 @@
     }
   },
   "meta": {
-    "git_sha": "fd8840b",
+    "git_sha": "0613f25",
     "python": "3.10.12",
-    "timestamp": "2026-10-28T00:24:48",
+    "timestamp": "2026-10-28T01:14:57",
     "seed": 0,
     "n_boot": 2000
   },

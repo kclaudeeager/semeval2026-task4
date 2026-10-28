@@ -1,10 +1,15 @@
 # Root config. Every run is a composition of these groups, so a comparison is a
 # config diff rather than an edited script.
+#
+# `experiment: null` has to be listed for `experiment=ablation` to work at all:
+# Hydra can only override a group that already appears in the defaults list.
+# It sits after `_self_` so an experiment's settings win over the root's.
 defaults:
   - scorer: l0_jaccard
   - data: dev
   - eval: default
   - _self_
+  - experiment: null
 
 hydra:
   run:
