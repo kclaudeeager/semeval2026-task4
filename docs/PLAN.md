@@ -58,6 +58,17 @@ so 29 days. One milestone per week, each ending in something committed.
     diagnostic, and the negative results stated plainly.
 20. **25 Nov** — submit.
 
+## Changed by the power analysis (28 Oct, see POWER.md)
+
+- The **confirmatory** result is L4 against L2 on all 400 test items, paired.
+  That is detectable at roughly 4-6 points.
+- The **per-stratum** result is descriptive. Report point estimates with
+  intervals and state that 79- and 133-item strata cannot support a
+  significance claim.
+- Run McNemar **within** each stratum, never between them. Between-strata
+  comparison would need a 17.3-point gap against a hoped-for 3-8.
+- Do not tune the diagnostic on dev: its unanimous strata are 40 and 71.
+
 ## Carried forward from the proposal
 
 - **The TF-IDF dev figure changes under the clean protocol.** The proposal
