@@ -89,3 +89,74 @@ not yet decisive, for three reasons worth stating plainly:
 - **L4 was quadratic in redundant work**, as above.
 - **Background runs were being reaped** when the shell exited; they need
   `setsid` on this machine.
+
+---
+
+# Update, 28 October: the backbone landed
+
+`l2_e5` ran on dev: **58.50%** [52.0, 65.5]. It is now the best single layer.
+
+| layer | dev | vs L2, paired |
+|---|---|---|
+| **L2 e5 embeddings** | **58.50** | — |
+| L3n characters (all noun chunks) | 57.00 | −1.50, p = 0.828 |
+| L4n roles | 53.50 | −5.00, p = 0.332 |
+| L3n characters (actors only) | 52.50 | −6.00, p = 0.207 |
+| L1 TF-IDF | 51.50 | −7.00, p = 0.151 |
+
+No structural layer beats the backbone, and none of the gaps is significant.
+
+## Does combining them have any headroom?
+
+The per-item vectors say the layers disagree a lot: L2 and L3n agree on only
+57.5% of items, and L3n gets 41 items right that L2 gets wrong. The union of
+all four layers covers 86.5% of dev, close to the 89% human ceiling. That looks
+like a great deal of room for a combiner.
+
+**It is not.** On a binary task, four systems at 51–58% accuracy would cover
+**96.0%** of items by chance alone if their errors were independent. The
+observed union is 86.5%, which is **9.5 points below** the independence
+baseline. The layers are failing on the *same* items.
+
+The pairwise error correlations confirm it, and the structure of them is the
+interesting part:
+
+| pair | phi |
+|---|---|
+| L3n vs L4n | **+0.446** |
+| L4n vs TF-IDF | +0.279 |
+| L3n vs TF-IDF | +0.269 |
+| L2 vs TF-IDF | +0.178 |
+| L2 vs L4n | +0.130 |
+| L2 vs L3n | +0.129 |
+
+L3n and L4n are nearly redundant with each other (+0.446), and both correlate
+with TF-IDF about as much as they do with the embeddings. That is what you would
+expect if the structural layers are, as the actors-only result already
+suggested, mostly measuring lexical content through a more expensive pipeline.
+
+A naive majority vote over the four layers scores **45.5%** — below chance.
+Correlated errors do not average out; they compound.
+
+## What this means for the hypothesis
+
+Three independent lines now point the same way:
+
+1. Filtering the cast to things that behave like characters **costs** 4.5 points.
+2. No structural layer beats the embedding backbone.
+3. The structural layers' errors correlate with each other and with TF-IDF more
+   than they reduce the backbone's errors.
+
+The reading is that these features capture lexical content, not narrative
+structure. **Coreference is still the untested component**, and it is the one
+the hypothesis actually rests on — so this is not yet the final word. But the
+pre-coreference evidence is consistently negative, and the report should say so
+in those terms rather than waiting for a result that rescues it.
+
+## Still to run
+
+`python -m task4.cli scorer=l5n_combined_nocoref data=dev` — the fitted
+combination of L2 + L3n + L4n. Given the error correlations, expect it to land
+at or just above L2 alone. Run it anyway: "the combination does not beat its
+strongest component" is a reportable result, and it is the experiment the
+proposal promised.
