@@ -40,3 +40,34 @@ def test_predict_returns_one_decision_per_triple():
 
 def test_tokenizer_lowercases_and_drops_punctuation():
     assert tokenize("The Dog's, bark!") == ["the", "dog's", "bark"]
+
+
+def test_embedding_alignment_batches_its_encoder_calls():
+    """One batched call per triple, not one call per character."""
+    from task4.scorers.embedalign import CharactersEmbedAligned
+    from task4.scorers.characters import Character
+    import numpy as np
+
+    calls = {"n": 0, "texts": 0}
+
+    class FakeEncoder:
+        def encode(self, texts, **kw):
+            batch = [texts] if isinstance(texts, str) else list(texts)
+            calls["n"] += 1
+            calls["texts"] += len(batch)
+            return np.array([[float(len(t)), 1.0] for t in batch])
+
+    s = CharactersEmbedAligned.__new__(CharactersEmbedAligned)
+    s.embed_prefix = ""
+    s.batch_size = 64
+    s._enc = FakeEncoder()
+    s.__dict__["_vec_cache"] = {}
+
+    cast_a = [Character(mentions=[f"c{i}"], context=["x"]) for i in range(30)]
+    cast_b = [Character(mentions=[f"d{i}"], context=["y"]) for i in range(30)]
+    s.warm(cast_a, cast_b)
+
+    assert calls["n"] == 1, "60 characters should take one encoder call, not 60"
+    assert calls["texts"] == 60
+    s.warm(cast_a, cast_b)
+    assert calls["n"] == 1, "a second warm on cached characters must not re-encode"

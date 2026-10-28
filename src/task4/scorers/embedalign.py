@@ -36,13 +36,33 @@ class _EmbeddingPairs:
         """The character as text: its mentions plus the words around them."""
         return f"{character.head}: {' '.join(character.context)}"
 
+    def warm(self, *casts) -> None:
+        """Embed every uncached character in one batched call.
+
+        Encoding one short document at a time is dominated by per-call
+        overhead; a cast of ~60 characters over 600 stories is ~35k calls.
+        Batching the whole cast turns a forty-minute run into a few minutes.
+        """
+        cache = self.__dict__.setdefault("_vec_cache", {})
+        todo = []
+        for cast in casts:
+            for c in cast:
+                key = self.character_doc(c)
+                if key not in cache and key not in todo:
+                    todo.append(key)
+        if not todo:
+            return
+        vecs = self._encoder().encode(
+            [self.embed_prefix + k for k in todo],
+            normalize_embeddings=True, batch_size=self.batch_size,
+            show_progress_bar=False)
+        cache.update(zip(todo, vecs))
+
     def _vector(self, character: Character):
         key = self.character_doc(character)
         cache = self.__dict__.setdefault("_vec_cache", {})
         if key not in cache:
-            cache[key] = self._encoder().encode(
-                self.embed_prefix + key, normalize_embeddings=True,
-                show_progress_bar=False)
+            self.warm([character])
         return cache[key]
 
     def pair_weight(self, x: Character, y: Character) -> float:
@@ -50,16 +70,21 @@ class _EmbeddingPairs:
 
         return float(np.dot(self._vector(x), self._vector(y)))
 
+    def score(self, anchor: str, candidate: str) -> float:
+        self.warm(self.cast(anchor), self.cast(candidate))
+        return super().score(anchor, candidate)
+
 
 @register("l3x_characters_embed")
 class CharactersEmbedAligned(_EmbeddingPairs, CharactersNoCoref):
     """Structural alignment, embedding comparison. No coreference."""
 
     def __init__(self, embed_model: str = "sentence-transformers/all-MiniLM-L6-v2",
-                 embed_prefix: str = "", **kwargs):
+                 embed_prefix: str = "", batch_size: int = 64, **kwargs):
         super().__init__(**kwargs)
         self.embed_model = embed_model
         self.embed_prefix = embed_prefix
+        self.batch_size = batch_size
         self._enc = None
 
 
@@ -68,8 +93,9 @@ class RolesEmbedAligned(_EmbeddingPairs, RolesNoCoref):
     """As above, with the role term kept: role overlap plus embedded context."""
 
     def __init__(self, embed_model: str = "sentence-transformers/all-MiniLM-L6-v2",
-                 embed_prefix: str = "", **kwargs):
+                 embed_prefix: str = "", batch_size: int = 64, **kwargs):
         super().__init__(**kwargs)
         self.embed_model = embed_model
         self.embed_prefix = embed_prefix
+        self.batch_size = batch_size
         self._enc = None

@@ -10,3 +10,4 @@ params:
   context_window: 10
   min_mentions: 1
   actors_only: false
+  batch_size: 64

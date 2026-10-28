@@ -1,0 +1,131 @@
+{
+  "scorer": "l3n_characters_nocoref",
+  "split": "sample",
+  "n": 39,
+  "accuracy": 48.717948717948715,
+  "ci_low": 33.333333333333336,
+  "ci_high": 64.1025641025641,
+  "wilson_low": 33.86492878313309,
+  "wilson_high": 63.800891354303424,
+  "strata": {
+    "outcomes": {
+      "all_marked": {
+        "n": 9,
+        "accuracy": 11.11111111111111
+      },
+      "none_marked": {
+        "n": 11,
+        "accuracy": 54.54545454545455
+      },
+      "split": {
+        "n": 19,
+        "accuracy": 63.1578947368421
+      },
+      "contrast": {
+        "z": -2.026026679188629,
+        "p_value": 0.042762050748623194,
+        "diff": -43.43434343434343,
+        "note": "unpaired across disjoint strata: suggestive, not a system comparison"
+      }
+    },
+    "course_of_actions": {
+      "all_marked": {
+        "n": 24,
+        "accuracy": 33.333333333333336
+      },
+      "none_marked": {
+        "n": 1,
+        "accuracy": 100.0
+      },
+      "split": {
+        "n": 14,
+        "accuracy": 71.42857142857143
+      },
+      "contrast": {
+        "z": -1.3608276348795434,
+        "p_value": 0.17356816655592158,
+        "diff": -66.66666666666667,
+        "note": "unpaired across disjoint strata: suggestive, not a system comparison"
+      }
+    }
+  },
+  "meta": {
+    "git_sha": "5cc78c1",
+    "python": "3.10.12",
+    "timestamp": "2026-10-28T05:33:52",
+    "seed": 0,
+    "n_boot": 2000
+  },
+  "correct": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false
+  ],
+  "fitted": {},
+  "config": {
+    "scorer": {
+      "name": "l3n_characters_nocoref",
+      "params": {
+        "spacy_model": "en_core_web_sm",
+        "alpha": 0.5,
+        "context_window": 10,
+        "min_mentions": 1,
+        "actors_only": false
+      }
+    },
+    "data": {
+      "root": "data/raw/narrative-similarity-dataset",
+      "split": "sample",
+      "fit_split": "sample"
+    },
+    "eval": {
+      "n_boot": 2000,
+      "seed": 0,
+      "aspects": [
+        "outcomes",
+        "course_of_actions"
+      ],
+      "out_dir": "reports/results",
+      "allow_test": false,
+      "compare_against": null,
+      "cv_folds": 5
+    }
+  },
+  "params_tag": "e1c6459a"
+}
