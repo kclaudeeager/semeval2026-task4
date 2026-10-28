@@ -16,11 +16,37 @@ DARK = {"surface": "#1a1a19", "ink": "#f0efec", "muted": "#c3c2b7", "grid": "#3a
         "s1": "#3987e5", "s2": "#d95926", "s3": "#199e70"}
 
 LAYER_ORDER = ["l0_random", "l0_jaccard", "l1_tfidf", "l2_e5",
+               "l3n_characters_nocoref", "l4n_roles_nocoref",
                "l3_characters", "l4_roles", "l5_combined"]
 LAYER_LABEL = {"l0_random": "L0 random", "l0_jaccard": "L0 Jaccard", "l1_tfidf": "L1 TF-IDF",
                "l2_e5": "L2 e5 embeddings", "l3_characters": "L3 characters",
-               "l4_roles": "L4 roles", "l5_combined": "L5 combined"}
+               "l4_roles": "L4 roles", "l5_combined": "L5 combined",
+               "l3n_characters_nocoref": "L3n characters (no coref)",
+               "l4n_roles_nocoref": "L4n roles (no coref)"}
 CHANCE = 50.0
+
+
+def _base(key: str) -> str:
+    return key.split(":", 1)[0]
+
+
+def _ordered(results: dict) -> list[str]:
+    """Sort result keys by layer order, keeping parameter variants together."""
+    rank = {name: i for i, name in enumerate(LAYER_ORDER)}
+    return sorted(results, key=lambda k: (rank.get(_base(k), 99), k))
+
+
+def _label(key: str, results: dict) -> str:
+    """Name the layer, and name the variant when a layer was run more than once."""
+    base = _base(key)
+    name = LAYER_LABEL.get(base, base)
+    siblings = [k for k in results if _base(k) == base]
+    if len(siblings) < 2:
+        return name
+    params = (results[key].get("config", {}).get("scorer", {}) or {}).get("params", {}) or {}
+    if "actors_only" in params:
+        return f"{name}\n{'actors only' if params['actors_only'] else 'all noun chunks'}"
+    return f"{name}\n[{key.split(':', 1)[-1]}]"
 
 
 def _theme(dark: bool) -> dict:
@@ -64,7 +90,7 @@ def ablation_chart(results: dict[str, dict], out_path: str | Path,
     import matplotlib.pyplot as plt
 
     t = _theme(dark)
-    layers = [l for l in LAYER_ORDER if l in results]
+    layers = _ordered(results)
     if not layers:
         raise ValueError("no results to plot")
     acc = [results[l]["accuracy"] for l in layers]
@@ -85,7 +111,7 @@ def ablation_chart(results: dict[str, dict], out_path: str | Path,
         ax.text(a + h + 1.2, yi, f"{a:.1f}", va="center", color=t["ink"],
                 fontsize=10, fontweight="medium")
 
-    ax.set_yticks(list(y), [LAYER_LABEL.get(l, l) for l in layers], color=t["ink"])
+    ax.set_yticks(list(y), [_label(l, results) for l in layers], color=t["ink"])
     ax.invert_yaxis()
     # Reference-line labels go above the plot, clear of the bars and the tick row.
     top = ax.get_ylim()[1]
