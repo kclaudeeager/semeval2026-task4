@@ -14,6 +14,14 @@ setup:      ## create the venv (outside OneDrive) and install the package
 data:       ## unpack the dataset into data/raw
 	bash scripts/fetch_data.sh
 
+doctor:     ## check which layers this environment can actually run
+	$(PY) scripts/doctor.py
+
+models:     ## install the layers that need downloads (L2, L3, L4, L5)
+	VIRTUAL_ENV=$(VENV) uv pip install -e ".[embeddings,structure]" --upgrade
+	$(PY) -m spacy download en_core_web_sm
+	$(PY) scripts/doctor.py
+
 test:       ## run the test suite
 	$(PY) -m pytest -q
 

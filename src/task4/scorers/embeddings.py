@@ -21,8 +21,32 @@ class E5Scorer(Scorer):
         self._cache: dict[str, object] | None = {} if cache else None
         self._model = None
 
+    @staticmethod
+    def _preflight() -> None:
+        """Fail with a sentence that says what to do.
+
+        transformers 5.x disables PyTorch when it finds torch < 2.6 and then
+        raises an unrelated NameError deep inside an import chain. Checking
+        first turns forty lines of traceback into one line of instruction.
+        """
+        try:
+            import torch
+        except ImportError as exc:
+            raise RuntimeError(
+                'L2 needs the embeddings extra: uv pip install -e ".[embeddings]"'
+            ) from exc
+        major, minor = (int(x) for x in torch.__version__.split(".")[:2])
+        if (major, minor) < (2, 6):
+            raise RuntimeError(
+                f"torch {torch.__version__} is too old for transformers 5.x, which "
+                "silently disables PyTorch below 2.6 and then fails with an "
+                "unrelated NameError.\n"
+                'Fix: uv pip install --upgrade "torch>=2.6"'
+            )
+
     def _load(self):
         if self._model is None:
+            self._preflight()
             from sentence_transformers import SentenceTransformer
 
             self._model = SentenceTransformer(self.model_name)

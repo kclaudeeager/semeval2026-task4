@@ -80,6 +80,17 @@ so 29 days. One milestone per week, each ending in something committed.
 - **Abstract theme stays out of the diagnostic**: every annotator marked it on
   392 of 400 test items, so it has no contrast to measure.
 
+## Environment traps already hit
+
+- **torch must be >= 2.6.** transformers 5.x declares that floor only under an
+  optional extra, so a stale torch 2.2 satisfies every stated constraint,
+  transformers then disables PyTorch, and the failure surfaces as
+  `NameError: name 'nn' is not defined` forty lines into an import chain.
+  `pyproject.toml` now pins it and `E5Scorer` checks it before loading.
+- **Run `make doctor` before any long run.** It prints which layers the current
+  environment can execute, which is cheaper than finding out after ten minutes.
+- `make models` installs the download-dependent layers and re-checks.
+
 ## If something slips
 
 L3 and L4 are the risk. If coreference will not install or is too slow, fall back

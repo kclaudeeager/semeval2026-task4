@@ -12,8 +12,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-embeddings = ["sentence-transformers>=3.0", "torch>=2.2"]
-structure  = ["maverick-coref>=1.0", "spacy>=3.7"]
+# torch>=2.6 is pinned here deliberately. transformers 5.x only declares that
+# floor under its optional [torch] extra, so nothing in the graph forces it:
+# a stale torch 2.2 satisfies sentence-transformers' own "torch>=2.2", and
+# transformers then silently disables PyTorch and dies later with
+# "NameError: name 'nn' is not defined". Pinning it here is what prevents that.
+embeddings = [
+  "torch>=2.6",
+  "sentence-transformers>=5.0,<7",
+  "transformers>=5.0,<6",
+]
+# spacy>=3.8 is the first release built against NumPy 2.
+structure  = ["maverick-coref>=1.0", "spacy>=3.8"]
 viz        = ["matplotlib>=3.8"]
 dev        = ["pytest>=8.0", "ruff>=0.5", "matplotlib>=3.8", "jupyterlab>=4.0", "nbformat>=5.9"]
 
