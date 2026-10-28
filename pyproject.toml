@@ -14,7 +14,8 @@ dependencies = [
 [project.optional-dependencies]
 embeddings = ["sentence-transformers>=3.0", "torch>=2.2"]
 structure  = ["maverick-coref>=1.0", "spacy>=3.7"]
-dev        = ["pytest>=8.0", "ruff>=0.5"]
+viz        = ["matplotlib>=3.8"]
+dev        = ["pytest>=8.0", "ruff>=0.5", "matplotlib>=3.8", "jupyterlab>=4.0", "nbformat>=5.9"]
 
 [project.scripts]
 task4 = "task4.cli:main"

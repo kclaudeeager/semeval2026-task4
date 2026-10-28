@@ -49,6 +49,14 @@ changes, so two runs are always comparable.
   carries the resolved config, the git SHA, the seed and the per-item correctness
   vector, so McNemar can be run later without recomputing anything.
 
+## Start here
+
+`notebooks/01_walkthrough.ipynb` opens every module in turn: what it does, the
+mathematics it implements, and a cell that runs it on real data. It executes
+end-to-end with only the base dependencies — the layers needing heavy models
+skip cleanly and say how to install them. `reports/figures/system_diagram.svg`
+shows how the pieces connect.
+
 ## Layout
 
 ```
@@ -60,6 +68,7 @@ reports/      results/ (one JSON per run) and figures/
 references/   proposal, design notes, paper extracts
 tests/        24 tests covering the statistics, the strata rule and the harness
 docs/PLAN.md  the schedule through 25 November
+notebooks/    01_walkthrough.ipynb — every module explained and run
 ```
 
 ## Reproduced so far
