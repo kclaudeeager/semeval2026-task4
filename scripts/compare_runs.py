@@ -43,7 +43,9 @@ if __name__ == "__main__":
 
     pairs = [("l3n_characters_nocoref/all-nouns", "l3x_characters_embed/all-nouns"),
              ("l3n_characters_nocoref/actors", "l3x_characters_embed/actors"),
-             ("l4n_roles_nocoref/actors", "l4x_roles_embed/all-nouns"),
+             ("l4n_roles_nocoref/actors", "l4x_roles_embed/actors"),
+             ("l4n_roles_nocoref/all-nouns", "l4x_roles_embed/all-nouns"),
+             ("l2_e5", "l3x_characters_embed/actors"),
              ("l2_e5", "l3x_characters_embed/all-nouns")]
     print("\nTHE COMPARISON THAT ISOLATES ONE VARIABLE")
     for a, b in pairs:
