@@ -1,0 +1,12 @@
+name: l3x_characters_embed
+params:
+  # MiniLM for speed: ~10-20 characters per story, three stories per triple.
+  # Swap to intfloat/e5-base-v2 (with embed_prefix "query: ") for the stronger
+  # encoder once the cheap version has shown whether the idea has legs.
+  embed_model: sentence-transformers/all-MiniLM-L6-v2
+  embed_prefix: ""
+  spacy_model: en_core_web_sm
+  alpha: 0.5
+  context_window: 10
+  min_mentions: 1
+  actors_only: false

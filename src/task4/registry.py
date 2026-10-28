@@ -32,4 +32,4 @@ def available() -> list[str]:
 
 def _load_all() -> None:
     from .scorers import (lexical, embeddings, characters, roles,  # noqa: F401
-                          combined, nocoref)
+                          combined, nocoref, embedalign)

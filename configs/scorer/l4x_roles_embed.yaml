@@ -1,0 +1,11 @@
+name: l4x_roles_embed
+params:
+  embed_model: sentence-transformers/all-MiniLM-L6-v2
+  embed_prefix: ""
+  spacy_model: en_core_web_sm
+  alpha: 0.5
+  agent_weight: 0.5
+  role_weight: 0.7
+  context_window: 10
+  min_mentions: 1
+  actors_only: false
