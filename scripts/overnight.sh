@@ -4,6 +4,12 @@
 set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 PY="${PY:-$HOME/.venvs/task4/bin/python}"
+
+# Re-exec under caffeinate on macOS so a closed lid does not pause the run.
+if [[ "$(uname)" == "Darwin" && -z "${CAFFEINATED:-}" ]] && command -v caffeinate >/dev/null; then
+  export CAFFEINATED=1
+  exec caffeinate -i "$0" "$@"
+fi
 LOG="reports/runs_$(date +%Y%m%d_%H%M).log"
 mkdir -p reports
 
