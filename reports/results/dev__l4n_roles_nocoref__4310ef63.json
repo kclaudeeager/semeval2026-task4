@@ -23,7 +23,7 @@
       },
       "contrast": {
         "z": -1.1848964367910433,
-        "p_value": 0.23605839640949333,
+        "p_value": 0.23605839640949336,
         "diff": -11.65492957746479,
         "note": "unpaired across disjoint strata: suggestive, not a system comparison"
       }
@@ -50,9 +50,9 @@
     }
   },
   "meta": {
-    "git_sha": "fd8840b",
-    "python": "3.10.12",
-    "timestamp": "2026-10-28T00:41:19",
+    "git_sha": "acf1003",
+    "python": "3.12.12",
+    "timestamp": "2026-10-27T21:08:45",
     "seed": 0,
     "n_boot": 2000
   },
