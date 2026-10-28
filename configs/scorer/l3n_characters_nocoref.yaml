@@ -1,0 +1,7 @@
+name: l3n_characters_nocoref
+params:
+  spacy_model: en_core_web_sm
+  alpha: 0.5
+  context_window: 10
+  min_mentions: 1
+  actors_only: true

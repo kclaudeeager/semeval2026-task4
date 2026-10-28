@@ -46,7 +46,10 @@ def load_results(results_dir: str | Path, split: str) -> dict[str, dict]:
     out = {}
     for path in sorted(Path(results_dir).glob(f"{split}__*.json")):
         d = json.loads(path.read_text(encoding="utf-8"))
-        out[d["scorer"]] = d
+        key = d["scorer"]
+        if d.get("params_tag", "default") != "default":
+            key = f"{key}:{d['params_tag']}"
+        out[key] = d
     return out
 
 

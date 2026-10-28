@@ -90,13 +90,30 @@ def compare(a: Result, b: Result) -> dict:
     return out
 
 
+def params_tag(config: dict | None) -> str:
+    """Short, stable tag for a run's scorer parameters.
+
+    Without this, two runs of the same layer under different parameters write to
+    the same filename and the second silently destroys the first. That happened
+    once; hence the tag.
+    """
+    import hashlib
+
+    params = ((config or {}).get("scorer") or {}).get("params") or {}
+    if not params:
+        return "default"
+    blob = json.dumps(params, sort_keys=True)
+    return hashlib.sha1(blob.encode()).hexdigest()[:8]
+
+
 def save(result: Result, out_dir: str | Path, config: dict | None = None) -> Path:
     """One JSON per run, carrying the resolved config, so results are self-describing."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     payload = asdict(result)
     payload["config"] = config or {}
-    path = out_dir / f"{result.split}__{result.scorer}.json"
+    payload["params_tag"] = params_tag(config)
+    path = out_dir / f"{result.split}__{result.scorer}__{payload['params_tag']}.json"
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return path
 
