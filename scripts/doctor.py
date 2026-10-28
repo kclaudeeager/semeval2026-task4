@@ -5,7 +5,11 @@ import sys
 
 REQUIRED = [("hydra", None), ("omegaconf", None), ("numpy", None),
             ("scipy", None), ("sklearn", None)]
-EMBEDDINGS = [("torch", (2, 6)), ("transformers", (5, 0)), ("sentence_transformers", (5, 0))]
+# On Intel macOS the ceiling is torch 2.2.2, so the floor has to be lower there.
+_INTEL_MAC = sys.platform == "darwin" and __import__("platform").machine() == "x86_64"
+EMBEDDINGS = ([("torch", (2, 2)), ("transformers", (4, 41)), ("sentence_transformers", (3, 0))]
+              if _INTEL_MAC else
+              [("torch", (2, 6)), ("transformers", (5, 0)), ("sentence_transformers", (6, 0))])
 STRUCTURE = [("spacy", (3, 8)), ("maverick", None)]
 
 
@@ -42,7 +46,14 @@ def check(group: str, specs, hint: str) -> bool:
 
 
 if __name__ == "__main__":
-    print(f"python {sys.version.split()[0]}  at  {sys.executable}")
+    import platform
+
+    print(f"python {sys.version.split()[0]} ({platform.machine()}) at {sys.executable}")
+    if _INTEL_MAC:
+        print("  note: Intel macOS. PyTorch has no wheels past 2.2.2 for this\n"
+              "        platform, so the embeddings stack is pinned to torch 2.2.2 +\n"
+              "        transformers 4.x + numpy 1.x. If this Mac is Apple Silicon,\n"
+              "        this Python is running under Rosetta - see docs/PLAN.md.")
     core = check("core", REQUIRED, 'uv pip install -e ".[dev]"')
     emb = check("L2 embeddings", EMBEDDINGS, 'uv pip install -e ".[embeddings]" --upgrade')
     st = check("L3/L4 structure", STRUCTURE,

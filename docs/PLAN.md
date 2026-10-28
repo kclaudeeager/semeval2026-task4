@@ -90,6 +90,17 @@ so 29 days. One milestone per week, each ending in something committed.
 - **Run `make doctor` before any long run.** It prints which layers the current
   environment can execute, which is cheaper than finding out after ten minutes.
 - `make models` installs the download-dependent layers and re-checks.
+- **PyTorch has no macOS x86_64 wheels past 2.2.2** (2.3.0 onward is arm64
+  only). On Intel macOS the whole embeddings stack is therefore capped:
+  torch 2.2.2, transformers 4.x, numpy 1.x. `pyproject.toml` selects that set
+  automatically with environment markers.
+- **If the Mac is Apple Silicon**, an x86_64 Python means the venv is running
+  under Rosetta and is leaving a lot on the table (no MPS, slower CPU).
+  Check with `python -c "import platform; print(platform.machine())"`. If the
+  machine is arm64 but Python says x86_64, rebuild the venv with a native
+  Python: `arch -arm64 /opt/homebrew/bin/python3 -m venv ~/.venvs/task4`, or
+  install an arm64 Python first. Then `make setup && make models` picks up
+  torch 2.14 and the modern stack.
 
 ## If something slips
 

@@ -12,15 +12,24 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# torch>=2.6 is pinned here deliberately. transformers 5.x only declares that
-# floor under its optional [torch] extra, so nothing in the graph forces it:
-# a stale torch 2.2 satisfies sentence-transformers' own "torch>=2.2", and
-# transformers then silently disables PyTorch and dies later with
-# "NameError: name 'nn' is not defined". Pinning it here is what prevents that.
+# The embeddings stack splits by platform, because PyTorch stopped shipping
+# macOS x86_64 wheels after 2.2.2 (2.3.0 onward is arm64 only).
+#
+#   Intel macOS : torch is capped at 2.2.2, which caps transformers at 4.x
+#                 (5.x silently disables a torch below 2.6) and numpy at 1.x
+#                 (2.2.2 was compiled against the NumPy 1 ABI).
+#   Everywhere  : current torch, current transformers.
+#
+# sentence-transformers <6 is what allows transformers 4.x; >=6 requires 5.x.
 embeddings = [
-  "torch>=2.6",
-  "sentence-transformers>=5.0,<7",
-  "transformers>=5.0,<6",
+  # --- macOS on Intel ---
+  "torch==2.2.2;                sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  "transformers>=4.41,<5;       sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  "sentence-transformers>=3,<6; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  "numpy<2;                     sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  # --- Apple Silicon, Linux, Windows ---
+  "torch>=2.6;                  sys_platform != 'darwin' or platform_machine != 'x86_64'",
+  "sentence-transformers>=6;    sys_platform != 'darwin' or platform_machine != 'x86_64'",
 ]
 # spacy>=3.8 is the first release built against NumPy 2.
 structure  = ["maverick-coref>=1.0", "spacy>=3.8"]

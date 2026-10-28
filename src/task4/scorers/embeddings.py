@@ -35,13 +35,20 @@ class E5Scorer(Scorer):
             raise RuntimeError(
                 'L2 needs the embeddings extra: uv pip install -e ".[embeddings]"'
             ) from exc
-        major, minor = (int(x) for x in torch.__version__.split(".")[:2])
-        if (major, minor) < (2, 6):
+        import transformers
+
+        torch_v = tuple(int(x) for x in torch.__version__.split(".")[:2])
+        tf_v = tuple(int(x) for x in transformers.__version__.split(".")[:2])
+        # transformers 5.x disables PyTorch below 2.6 and then dies with an
+        # unrelated NameError. On Intel macOS torch cannot go above 2.2.2, so
+        # there the fix is to hold transformers at 4.x instead.
+        if tf_v >= (5, 0) and torch_v < (2, 6):
             raise RuntimeError(
-                f"torch {torch.__version__} is too old for transformers 5.x, which "
-                "silently disables PyTorch below 2.6 and then fails with an "
-                "unrelated NameError.\n"
-                'Fix: uv pip install --upgrade "torch>=2.6"'
+                f"transformers {transformers.__version__} needs torch>=2.6 but "
+                f"torch {torch.__version__} is installed.\n"
+                'Fix: uv pip install -e ".[embeddings]" --upgrade\n'
+                "On Intel macOS torch stops at 2.2.2, so that command pins "
+                "transformers to 4.x instead."
             )
 
     def _load(self):
