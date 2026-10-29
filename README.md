@@ -53,7 +53,14 @@ changes, so two runs are always comparable.
 
 ## Start here
 
-`notebooks/01_walkthrough.ipynb` opens every module in turn: what it does, the
+**`notebooks/02_building_up.ipynb` is the one to read first.** It builds the
+project one brick at a time — plain code, one idea per section, a number after
+each, and the single question "did that buy anything?". Its order is the report's
+outline and the talk's running order. `reports/figures/the_story.png` is the
+slide it produces.
+
+`notebooks/01_walkthrough.ipynb` is the reference companion: it opens every
+module in turn: what it does, the
 mathematics it implements, and a cell that runs it on real data. It executes
 end-to-end with only the base dependencies — the layers needing heavy models
 skip cleanly and say how to install them. `reports/figures/system_diagram.svg`

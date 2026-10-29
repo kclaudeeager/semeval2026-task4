@@ -1,0 +1,358 @@
+{
+  "scorer": "l5_combined",
+  "split": "dev",
+  "n": 200,
+  "accuracy": 56.0,
+  "ci_low": 49.5,
+  "ci_high": 63.0,
+  "wilson_low": 49.07154834956251,
+  "wilson_high": 62.70229957941764,
+  "strata": {
+    "outcomes": {
+      "all_marked": {
+        "n": 40,
+        "accuracy": 50.0
+      },
+      "none_marked": {
+        "n": 71,
+        "accuracy": 60.563380281690144
+      },
+      "split": {
+        "n": 89,
+        "accuracy": 55.056179775280896
+      },
+      "contrast": {
+        "z": -1.078531119744602,
+        "p_value": 0.28079680170390797,
+        "diff": -10.563380281690138,
+        "note": "unpaired across disjoint strata: suggestive, not a system comparison"
+      }
+    },
+    "course_of_actions": {
+      "all_marked": {
+        "n": 88,
+        "accuracy": 62.5
+      },
+      "none_marked": {
+        "n": 19,
+        "accuracy": 36.8421052631579
+      },
+      "split": {
+        "n": 93,
+        "accuracy": 53.763440860215056
+      },
+      "contrast": {
+        "z": 2.05460784885186,
+        "p_value": 0.03991689695556149,
+        "diff": 25.657894736842106,
+        "note": "unpaired across disjoint strata: suggestive, not a system comparison"
+      }
+    }
+  },
+  "meta": {
+    "git_sha": "6fb98e9",
+    "python": "3.12.12",
+    "timestamp": "2026-10-28T08:59:49",
+    "seed": 0,
+    "n_boot": 2000,
+    "cv_folds": 5
+  },
+  "correct": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    true
+  ],
+  "fitted": {
+    "per_fold": [
+      {
+        "components": [
+          "l2_e5",
+          "l3x_characters_embed",
+          "l4x_roles_embed"
+        ],
+        "weights": [
+          0.3,
+          0.0,
+          0.7
+        ]
+      },
+      {
+        "components": [
+          "l2_e5",
+          "l3x_characters_embed",
+          "l4x_roles_embed"
+        ],
+        "weights": [
+          0.2,
+          0.4,
+          0.4
+        ]
+      },
+      {
+        "components": [
+          "l2_e5",
+          "l3x_characters_embed",
+          "l4x_roles_embed"
+        ],
+        "weights": [
+          0.2,
+          0.1,
+          0.7
+        ]
+      },
+      {
+        "components": [
+          "l2_e5",
+          "l3x_characters_embed",
+          "l4x_roles_embed"
+        ],
+        "weights": [
+          0.3,
+          0.0,
+          0.7
+        ]
+      },
+      {
+        "components": [
+          "l2_e5",
+          "l3x_characters_embed",
+          "l4x_roles_embed"
+        ],
+        "weights": [
+          0.6,
+          0.4,
+          0.0
+        ]
+      }
+    ]
+  },
+  "config": {
+    "scorer": {
+      "name": "l5_combined",
+      "params": {
+        "components": [
+          "l2_e5",
+          "l3x_characters_embed",
+          "l4x_roles_embed"
+        ],
+        "weights": null,
+        "grid_step": 0.1
+      }
+    },
+    "data": {
+      "root": "data/raw/narrative-similarity-dataset",
+      "split": "dev",
+      "fit_split": "dev"
+    },
+    "eval": {
+      "n_boot": 2000,
+      "seed": 0,
+      "aspects": [
+        "outcomes",
+        "course_of_actions"
+      ],
+      "out_dir": "reports/results",
+      "allow_test": false,
+      "compare_against": null,
+      "cv_folds": 5
+    }
+  },
+  "params_tag": "4619f43f"
+}

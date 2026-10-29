@@ -16,8 +16,14 @@ def load(split: str = "dev") -> dict[str, dict]:
         d = json.loads(p.read_text(encoding="utf-8"))
         params = (d.get("config", {}).get("scorer", {}) or {}).get("params", {}) or {}
         key = d["scorer"]
+        # Every distinguishing parameter has to be in the key. Two runs that
+        # differed only by encoder were collapsing into one row.
         if "actors_only" in params:
             key += "/all-nouns" if params["actors_only"] is False else "/actors"
+        if "embed_model" in params:
+            key += "/" + params["embed_model"].split("/")[-1].replace("all-MiniLM-L6-v2", "MiniLM")
+        if "components" in params:
+            key += "/over-" + ("L3x" if any("embed" in c for c in params["components"]) else "L3n")
         out[key] = d
     return out
 
@@ -41,12 +47,13 @@ if __name__ == "__main__":
         cv = " (cross-validated)" if d.get("meta", {}).get("cv_folds") else ""
         print(f"  {k:<38} {d['accuracy']:6.2f}  [{d['ci_low']:5.1f},{d['ci_high']:5.1f}]{cv}")
 
-    pairs = [("l3n_characters_nocoref/all-nouns", "l3x_characters_embed/all-nouns"),
-             ("l3n_characters_nocoref/actors", "l3x_characters_embed/actors"),
-             ("l4n_roles_nocoref/actors", "l4x_roles_embed/actors"),
-             ("l4n_roles_nocoref/all-nouns", "l4x_roles_embed/all-nouns"),
-             ("l2_e5", "l3x_characters_embed/actors"),
-             ("l2_e5", "l3x_characters_embed/all-nouns")]
+    pairs = [("l3n_characters_nocoref/all-nouns", "l3x_characters_embed/all-nouns/MiniLM"),
+             ("l3n_characters_nocoref/actors", "l3x_characters_embed/actors/MiniLM"),
+             ("l4n_roles_nocoref/actors", "l4x_roles_embed/actors/MiniLM"),
+             ("l4n_roles_nocoref/all-nouns", "l4x_roles_embed/all-nouns/MiniLM"),
+             ("l2_e5", "l3x_characters_embed/actors/MiniLM"),
+             ("l2_e5", "l5_combined/over-L3n"),
+             ("l5_combined/over-L3n", "l5_combined/over-L3x")]
     print("\nTHE COMPARISON THAT ISOLATES ONE VARIABLE")
     for a, b in pairs:
         if a in R and b in R:
