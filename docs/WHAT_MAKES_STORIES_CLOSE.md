@@ -149,3 +149,52 @@ goes into phase 2.
 Theme is the whole summary on purpose. A sentence encoder already abstracts, and
 the whole-summary embedding is the strongest single layer in this project — that
 is itself the evidence that it proxies theme.
+
+---
+
+# Phase 1 result: no component escapes the equidistance
+
+Run 30 October, n = 150 dev triples, MiniLM.
+
+| component | right candidate closer | 95% CI | p vs 50% |
+|---|---|---|---|
+| theme | 56.0% | [48.0, 63.7] | 0.165 |
+| action | 54.0% | [46.0, 61.8] | 0.369 |
+| outcome | 52.7% | [44.7, 60.5] | 0.568 |
+
+**Every interval contains 50%.** None of the three components separates the
+right candidate from the wrong one better than a coin flip.
+
+And the direction is the opposite of what the decomposition hypothesis needs.
+The hypothesis was that the whole-story view *averages away* a signal that
+survives in a part — so some component should beat theme. Instead **theme is the
+strongest and outcome the weakest.** Theme is the whole summary. Slicing the
+story loses signal rather than revealing it.
+
+## The ordering is the interesting part
+
+| component | annotators cite it | geometric signal |
+|---|---|---|
+| theme | 98.3% | 56.0% |
+| action | 52.8% | 54.0% |
+| outcome | 24.0% | 52.7% |
+
+The rank order is identical. The components that annotators invoke most often
+are the ones carrying the most geometric separation, in the same order.
+
+This is three points, so a matching rank order happens by chance one time in
+six, and no individual difference is significant. It is corroboration, not
+proof. But it is the second independent route to the same conclusion: **this
+task is decided by what a story is about, and the whole-summary view is already
+the best available estimate of that.**
+
+## What this closes
+
+The component programme is answered before it was built. Phase 2 would fit
+weights over three components, and the geometry predicts where those weights
+will go: onto theme, which is the whole summary, which is the `l2_e5` layer that
+has led the table since the beginning.
+
+Running `make components` once is still worth doing, as a **confirmation** with
+a concrete artifact — the fitted weight vector is a single sentence for the
+report. It is no longer an exploration.
