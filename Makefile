@@ -33,6 +33,9 @@ runs:       ## the remaining dev runs (~10 min, survives the lid closing)
 summary:    ## results table, paired comparisons, error correlations
 	$(PY) scripts/compare_runs.py
 
+rhythm:     ## sequential-structure layers (~4 min)
+	$(KEEPAWAKE) bash scripts/rhythm_runs.sh
+
 test:       ## run the test suite
 	$(PY) -m pytest -q
 

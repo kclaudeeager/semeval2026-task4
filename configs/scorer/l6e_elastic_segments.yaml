@@ -1,0 +1,8 @@
+name: l6e_elastic_segments
+params:
+  # Five phases, matching the story-grammar decomposition that carried weight
+  # 0.40 in CascadeMind's learned combination on this task.
+  segments: 5
+  embed_model: sentence-transformers/all-MiniLM-L6-v2
+  embed_prefix: ""
+  batch_size: 64

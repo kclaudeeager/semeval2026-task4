@@ -71,3 +71,36 @@ def test_embedding_alignment_batches_its_encoder_calls():
     assert calls["texts"] == 60
     s.warm(cast_a, cast_b)
     assert calls["n"] == 1, "a second warm on cached characters must not re-encode"
+
+
+def test_segments_are_ordered_and_cover_the_text():
+    from task4.scorers.rhythm import split_segments
+
+    segs = split_segments("A. B. C. D. E. F.", 3)
+    assert len(segs) == 3
+    assert segs[0].startswith("A") and segs[-1].endswith("F.")
+
+
+def test_short_stories_still_yield_k_segments():
+    from task4.scorers.rhythm import split_segments
+
+    assert len(split_segments("Just one.", 5)) == 5
+    assert len(split_segments("", 4)) == 4
+
+
+def test_elastic_alignment_tolerates_pacing_but_not_reordering():
+    """DTW should forgive a stretched story and punish a shuffled one."""
+    import numpy as np
+    from task4.scorers.rhythm import ElasticSegments
+
+    s = ElasticSegments.__new__(ElasticSegments)
+    s.segments = 4
+
+    base = np.eye(4)                      # four orthogonal "phases"
+    stretched = np.array([base[0], base[0], base[1], base[2]])
+    shuffled = np.array([base[3], base[1], base[2], base[0]])
+
+    s._cache = {"base": base, "stretch": stretched, "shuffle": shuffled}
+    s.vectors = lambda t: s._cache[t]
+
+    assert s.score("base", "stretch") > s.score("base", "shuffle")
