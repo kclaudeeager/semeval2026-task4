@@ -38,7 +38,18 @@ class Scorer(ABC):
 
     def predict(self, triples: list[Triple]) -> list[bool]:
         """True when candidate A is judged closer, matching `text_a_is_closer`."""
-        return [self.score(t.anchor, t.text_a) >= self.score(t.anchor, t.text_b) for t in triples]
+        return [a >= b for a, b in self.score_pairs(triples)]
+
+    def score_pairs(self, triples: list[Triple]) -> list[tuple[float, float]]:
+        """(score for A, score for B) per triple.
+
+        Kept separate from predict() so the margin between the two candidates
+        survives into the result file. A thin margin says something a win/lose
+        bit cannot: how close the benchmark put the wrong answer to the right
+        one.
+        """
+        return [(self.score(t.anchor, t.text_a), self.score(t.anchor, t.text_b))
+                for t in triples]
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__} name={self.name!r}>"

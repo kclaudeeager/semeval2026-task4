@@ -221,3 +221,37 @@ Coreference is still untested and remains the one component that could change
 this. It should be run. But the report should be written around the negative
 result that five independent measurements now support, with coreference as the
 final test of it rather than the hoped-for rescue.
+
+---
+
+# Update 3, 30 October: why it is hard
+
+The obvious objection to everything above is that comparing two short texts
+should not be difficult. Measuring the *margin* — how much daylight a method
+puts between the right and the wrong candidate — says why it is.
+
+On dev, with the gold answer known:
+
+| method | mean signed margin (right − wrong) | median absolute margin |
+|---|---|---|
+| Jaccard | **−0.0024** | 0.0166 |
+| TF-IDF | +0.0045 | 0.0180 |
+
+**Jaccard's mean margin is negative.** On average the *wrong* candidate shares
+more vocabulary with the anchor than the right one does. That is not an absence
+of signal, it is inverted signal, and it is exactly what the construction
+predicts: the distractor is drawn from the 98th–99th percentile of similarity
+under `story-emb`, corrected by subtracting `e5` similarity. The wrong answer
+was selected *because* it looks close.
+
+TF-IDF's margin is positive but negligible — a median separation of 0.018 on a
+cosine scale. On the 20% of triples where Jaccard puts the candidates within 5%
+of each other it is right 48% of the time, which is a coin flip.
+
+So the question is not "why did structure fail". It is "why would anything
+succeed", and the answer is that the benchmark was built so that similarity
+itself points the wrong way. A method has to find a signal that survives after
+surface similarity has been deliberately equalised.
+
+`evaluate()` now records the per-item signed margin alongside the correctness
+vector, so this analysis can be run for any layer.

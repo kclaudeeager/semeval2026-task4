@@ -75,3 +75,12 @@ def test_stateless_layers_are_not_marked_for_cross_validation():
 def test_fitted_parameters_are_recorded_in_the_result():
     r = evaluate(JaccardScorer(), _rows(), "dev", n_boot=50)
     assert r.fitted == {}
+
+
+def test_margins_are_signed_by_the_gold_answer():
+    """Positive margin means the gold candidate scored higher."""
+    rows = [Triple(anchor="dog", text_a="dog", text_b="zebra", a_is_closer=True),
+            Triple(anchor="dog", text_a="zebra", text_b="dog", a_is_closer=False)]
+    r = evaluate(JaccardScorer(), rows, "dev", n_boot=50)
+    assert len(r.margins) == 2
+    assert all(m > 0 for m in r.margins), "both should favour the gold candidate"
