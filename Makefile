@@ -36,6 +36,9 @@ summary:    ## results table, paired comparisons, error correlations
 rhythm:     ## sequential-structure layers (~4 min)
 	$(KEEPAWAKE) bash scripts/rhythm_runs.sh
 
+components: ## phase 1 validity check + phase 2 accuracy (~8 min)
+	$(KEEPAWAKE) bash scripts/component_runs.sh
+
 test:       ## run the test suite
 	$(PY) -m pytest -q
 

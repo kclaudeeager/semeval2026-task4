@@ -104,3 +104,27 @@ def test_elastic_alignment_tolerates_pacing_but_not_reordering():
     s.vectors = lambda t: s._cache[t]
 
     assert s.score("base", "stretch") > s.score("base", "shuffle")
+
+
+def test_outcome_component_is_the_tail_of_the_story():
+    from task4.components import decompose
+
+    c = decompose("One. Two. Three. Four. Five. Six. Seven. Eight.")
+    assert c.outcome.endswith("Eight.")
+    assert "One." not in c.outcome
+    assert c.theme.startswith("One.")
+
+
+def test_short_story_still_yields_all_three_components():
+    from task4.components import decompose
+
+    c = decompose("A single sentence summary.")
+    assert c.theme and c.action and c.outcome
+
+
+def test_single_component_scorer_zeroes_the_others():
+    from task4.registry import build
+
+    s = build("l7s_single_component", component="outcome")
+    assert s.weights == [0.0, 0.0, 1.0]
+    assert s.fits_parameters is False

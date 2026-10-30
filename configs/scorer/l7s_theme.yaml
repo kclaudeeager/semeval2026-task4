@@ -1,0 +1,6 @@
+name: l7s_single_component
+params:
+  component: theme
+  embed_model: sentence-transformers/all-MiniLM-L6-v2
+  embed_prefix: ""
+  spacy_model: en_core_web_sm

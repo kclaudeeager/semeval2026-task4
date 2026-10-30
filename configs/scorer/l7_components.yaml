@@ -1,0 +1,7 @@
+name: l7_components
+params:
+  embed_model: sentence-transformers/all-MiniLM-L6-v2
+  embed_prefix: ""
+  spacy_model: en_core_web_sm
+  weights: null       # fitted by grid search; the fitted vector IS the result
+  grid_step: 0.1
