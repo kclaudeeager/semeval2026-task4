@@ -53,7 +53,13 @@ changes, so two runs are always comparable.
 
 ## Start here
 
-**`notebooks/02_building_up.ipynb` is the one to read first.** It builds the
+**`notebooks/03_eda_geometry.ipynb` is the one to read first.** It asks whether
+the task is solvable by distance at all, before any method is built. The answer
+on dev is that the right and wrong candidates sit at the *same* distance from
+the anchor (51% — chance), which is what drawing the distractor from the
+98th–99th similarity percentile produces.
+
+**`notebooks/02_building_up.ipynb`** then builds the project brick by brick. It builds the
 project one brick at a time — plain code, one idea per section, a number after
 each, and the single question "did that buy anything?". Its order is the report's
 outline and the talk's running order. `reports/figures/the_story.png` is the
