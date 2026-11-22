@@ -1,0 +1,134 @@
+Task and setup. This project addresses Track A of SemEval-2026 Task 4 \citep{hatzel2026}, 
+which asks a system to select, from two candidate summaries, the one more similar to an anchor.
+
+The dataset is constructed rigorously, and in a way that matters for everything that follows.
+Summaries are drawn from Tell Me Again and cut to between four and eight sentences. Each anchor is chosen at random;
+both candidates are then retrieved with story-emb, an encoder trained so that different summaries of the same story land close together.
+The nearest summary becomes the assumed answer, and the distractor is drawn from the \DistractorPercentile\ similarity percentile — so both candidates sit inside the same neighbourhood of an encoder that rewards shared surface.
+Two commercial language models then judge each triple, and only those they disagree on reach human annotators. 
+Of \AnnotTotal\ triples, \AnnotAgreed\ had two annotators agree and \AnnotAdjudicated\ more were settled by a third, leaving \AnnotKept.
+Annotators also recorded which of three dimensions drove each decision: abstract theme, course of action, and outcomes.
+
+The items that survive are therefore those where a narrative-trained encoder's best guess is unreliable and two strong language models could not agree.
+They were selected against exactly the methods one would naturally reach for, as the data section shows in detail.
+
+The task is a binary forced choice, so the official metric is accuracy and chance is 50%.
+Each item scores 0 or 1 and accuracy is the proportion correct; variance and standard deviation are therefore determined by the accuracy itself,
+so this report describes uncertainty with bootstrap and Wilson intervals and compares systems with paired tests.
+On this scale the best official system (COGNAC) reached \OfficialBestA%, the strongest baseline (zero-shot GPT-4o-mini) \OfficialBaselineA%, and the estimated human upper bound is \HumanBound% — a contest fought over roughly 39 points above chance.
+The mean of the \OfficialRankedA\ ranked Track A systems is \OfficialMeanA%, computed here rather than published.
+
+I evaluate on the released splits: \DevN\ development triples, \TestN\ test triples, and a \SampleN-item sample set. 
+The system is built as a sequence of layers in which each layer adds exactly one representational commitment to the one before it, so that any change in accuracy is attributable to that single addition — and each layer's result, positive or negative, is what determines whether the next one is worth building.
+
+2. Data. What data did you actually work with, and how much of it? If
+what you obtained differs from what the task overview paper describes,
+quantify the difference and explain its cause.
+
+Data. The official dataset is publicly released.\footnote{\url{https://github.com/narrative-similarity-task/narrative-similarity-dataset}} Track A provides \SampleN\ sample, \DevN\ development and \TestN\ test triples. Summaries are licensed CC BY-SA 4.0 and the labels CC0: the summaries may be reused with attribution and under the same licence, while the annotations carry no restriction.
+
+Three properties of the release shaped the design of this project. First, no training split is provided, so fine-tuning on task data is not available; every model used here is pretrained and frozen, and all engineering happens in the representation rather than in the weights. Second, the test labels are public. This makes the leaderboard reproducible, and simultaneously makes overfitting them a matter of discipline rather than of access — one team was disqualified on exactly this point \citep{hatzel2026}. I therefore reserved the test split for a single final evaluation, fixed in advance in docs/PREREGISTRATION.md, having used it once earlier while writing the proposal to run untuned baselines against the published figures. Third, stories recur across splits, so development and test are not independent samples; a configuration selected on development is optimistic on test for that reason alone. Parameter fitting is therefore done by cross-validation within a split, and the development result is treated as a design signal rather than as an estimate of test performance.
+
+Dataset construction pipleline: 
+
+the following figure dipicts the dataset pipeline:
+
+figure
+
+
+\subsection{How the triples were built}
+
+Summaries come from \emph{Tell Me Again}, restricted to between four and eight
+sentences. Each anchor is then sampled at random, and both candidates are drawn
+relative to it using \texttt{story-emb}, an encoder trained so that different
+summaries of the same story land close together. The nearest story becomes the
+assumed answer; the distractor is drawn from the \DistractorPercentile\ similarity
+percentile, which places both candidates inside the same neighbourhood as the
+anchor rather than merely nearby.
+
+Two commercial language models then judge every triple, and only the triples on
+which they disagree proceed to human annotation. Of the \AnnotTotal\ triples
+that reached annotators, \AnnotAgreed\ had two annotators agree, a rate of
+\AnnotAgreePct\%, and \AnnotAdjudicated\ more were settled by a third; the
+remaining \AnnotDropped\ were never resolved and were dropped, leaving
+\AnnotKept. The released splits provide \SampleN\ sample, \DevN\ development
+and \TestN\ test triples.
+
+Two filters therefore act in sequence before an item is ever labelled. The
+sampling places the distractor at the same distance as the answer, and the
+language-model filter removes every triple on which two strong models already
+agree. What survives is, by construction, the set of items where a
+narrative-trained nearest-neighbour encoder is unreliable \emph{and} two
+commercial models cannot agree.
+
+\subsection{What the annotators recorded}
+
+Alongside the binary choice, annotators recorded which of three dimensions
+applied to the similarity they judged: abstract theme, course of action, and
+outcomes. These are independent checkboxes rather than a ranking, and an
+annotator ticks \AnnDimsPerJudgment\ of the three on average. Across the
+\AnnPoolN\ annotated development and test triples, a majority of annotators
+marked abstract theme on \AnnThemePct\%, course of action on \AnnActionPct\%
+and outcomes on \AnnOutcomePct\%.
+
+Agreement on those dimensions is far weaker than agreement on the choice
+itself. Krippendorff's $\alpha$ is \AlphaOverall\ overall and between
+\AlphaPerDimLo\ and \AlphaPerDimHi\ per dimension. Annotators who agree on
+\emph{which} story is closer frequently disagree on \emph{why}, and that gap
+sets a ceiling on what any per-dimension diagnostic can establish.
+
+The consequence is a property of the benchmark rather than of any system built
+on it. A dimension recorded on almost every item has no contrast group: on the
+development split, theme is marked unanimously on \StratThemeMarked\ of \DevN\
+triples and unanimously declined on \StratThemeUnmarked. Course of action gives
+strata of \StratActionMarked\ against \StratActionUnmarked, and outcomes
+\StratOutcomeMarked\ against \StratOutcomeUnmarked. The most frequently cited
+dimension is therefore the least usable for diagnosis, and outcomes --- the
+least cited --- is the only one yielding strata large enough to compare. The
+stratified analysis in Section~\ref{sec:analysis} uses outcomes for this
+reason.
+
+Taken together, the construction and the annotation declare this task to be one
+that naive text-processing techniques should not be expected to solve. The
+evidence bears that out. The strongest baseline supplied by the organizers, a
+zero-shot \texttt{GPT-4o-mini} prompt, reaches \OfficialBaselineA\%; the
+winning system, COGNAC, reaches \OfficialBestA\%, still well short of the
+estimated human ceiling near \HumanBound\%; the mean over the
+\OfficialRankedA\ ranked Track~A systems, computed here from the overview
+table, is \OfficialMeanA\%; and simple vocabulary overlap falls below chance at
+\JaccardAcc\% on development data.
+Why that happens, rather than merely that it happens, is the subject of
+Section~\ref{sec:analysis}.
+
+
+Reconciliation against the published baseline. Before trusting any number from this pipeline I reproduced the organizers' lexical baseline. Token-overlap similarity reaches \JaccardTestAcc% on test against the \PublishedJaccardTest% reported in the overview --- a difference of \JaccardGapPts\ points, or \JaccardGapItems\ items out of \TestN. The cause is tokenization. The implementation here treats the apostrophe as word-internal, so possessives and contractions such as \emph{father's} and \emph{doesn't} remain single tokens, while accented words such as \emph{fianc'ee} are split; \JaccardDiffTypes\ token types differ from a plain \texttt{\textbackslash w+} pattern, \JaccardDiffApostPct% of them apostrophe-bearing. \JaccardFlipN\ test items change prediction between the two conventions, \JaccardFlipFor\ in favour of the one used here and \JaccardFlipAgainst\ against, netting the \JaccardGapItems. \JaccardVariantsMatching\ ordinary alternatives --- word characters, whitespace splitting, alphabetic-only and case-sensitive matching --- reproduce the published \PublishedJaccardTest% exactly. I retain the original tokenizer for consistency with the rest of the pipeline and note that it flatters this baseline by \JaccardGapPts\ points. The choice does not affect the development result reported in Section~\ref{sec:analysis}: all \JaccardVariantsN\ tokenizations tested fall below chance there, between \JaccardMinVariant% and \JaccardMaxVariant%.
+
+
+3. Approach. What did you build, and why did you expect it to perform
+well? Describe it in enough detail that a classmate could reimplement it.
+Make sure to state any models, libraries, or external data you used.
+
+The approach is an incremental ablation in which each layer tests whether one additional representation steeres the similarity judgement and problem understandig.
+
+The design is meant to build from lexical to structual where the assumption is lexical identifies the shalow relationships while structual goes deep down of the underlying relationships.
+
+L0 is meant to reproduce the baseline. random, Jaccard. Reproduce the published baseline first:
+  `\JaccardTestAcc` 58.00 against `\PublishedJaccardTest` 56.25, gap traced to
+tokenization. 
+
+\textbf{L1} is TF--IDF cosine, which measures how much of the task is word overlap; if the answer is ``most of it'', nothing structural is needed. \textbf{L2} is sentence embeddings, \texttt{intfloat/e5-base-v2} \cite{e5} with the \texttt{"query: "} prefix, scoring whole summaries by cosine; the organisers publish no Track~A figure for it, so L2 establishes one, and it should help if the decision turns on paraphrase rather than on structure.
+ \textbf{L3} adds characters: coreference chains from \texttt{maverick-mes-litbank} \cite{maverick,jm3} give each story its cast, and story similarity is the score of the best one-to-one matching between the two casts, computed with the Hungarian algorithm (\texttt{scipy.optimize.linear_sum_assignment}) over mention-string and context similarity. For this to help, similar stories must be populated by correspondable casts --- which is precisely what is being tested.
+
+  \textbf{L4} adds roles: for each character, the verb
+lemmas where it is the syntactic subject act as an agent proxy and those where it is the object as a patient
+proxy \cite[Chapter~22]{jm3}, and the matching is scored on shared role--lemma pairs instead of mentions. This is meant to describe activities in the stories unlike \textbf{L2} which scores against the players here we can catch any anonymizations or role-replays. stories that holds same activies can land together no matter who plyed them.
+
+\textbf{L5}
+combines L2 with the L3 and L4 scores, weights fitted by cross-validation. Each layer scores the anchor against
+both candidates and picks the higher. This is meant to decide which benefits is in ensembling lexical based and structual based approaches and identify which one pulls more weights than others.
+That was proposed before identifying the reality when we actually implement it and it paved the way of \textbf{L6} and  \textbf{L7}
+\textbf{L6}—positional and elastic segments: This circulated in my design brief as the most promissing signal drawer—a way to segment the story particles and story rhythym as if same beat can mean similar story. this has been built but never ran.
+It was meant to explore the emotional arc and positional structure, but after a carefull review of what the previous \textbf{L3,4} taught, and the cost of running this layer, I decided to not run it because I anticipated that it wouldn't be worth it.
+
+\textbf{L6} is sequential structure. Each summary is cut into five ordered segments, each segment is embedded with \texttt{all-MiniLM-L6-v2}, and the two stories are compared slot by slot --- the first fifth against the first fifth, the second against the second, and so on --- with the five similarities averaged. A whole-summary embedding collapses the text into a single vector and so cannot distinguish a story that resolves early from one that resolves late; L6 asks whether two similar stories put comparable material in comparable places.
+\textbf{L7} decomposes each summary along the three dimensions the annotators recorded about their own decisions --- course of action, outcomes, and abstract theme --- and scores the candidates dimension by dimension rather than whole. If the annotation reflects how the judgement is actually made, scoring the same components separately should recover it.

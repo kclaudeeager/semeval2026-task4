@@ -20,3 +20,21 @@ venv/
 # os / editor
 .DS_Store
 *.swp
+
+# working scratch and backups: not evidence
+report/_scratch/
+report/*.bak
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.fls
+report/*.fdb_latexmk
+report/tmp*.tmp
+report/*.synctex.gz
+
+# drafting scaffolding, not experimental evidence
+docs/WRITING_MAP.md
+docs/MORNING_PACK.md
+docs/merged/

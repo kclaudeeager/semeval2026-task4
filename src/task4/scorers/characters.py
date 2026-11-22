@@ -5,11 +5,40 @@ resolving coreference and named missed coreference as a source of error; this
 layer supplies the component they lacked.
 """
 from __future__ import annotations
+import contextlib
 from dataclasses import dataclass, field
 
 from ..registry import register
 from .base import Scorer
 from .lexical import tokenize
+
+
+@contextlib.contextmanager
+def _prefer_safetensors():
+    """Make every nested ``from_pretrained`` load safetensors.
+
+    transformers 4.57 refuses to ``torch.load`` a ``pytorch_model.bin`` unless
+    torch >= 2.6 (CVE-2025-32434), and torch is capped at 2.2.2 on Intel macOS.
+    The restriction does not apply to safetensors, and the maverick encoder
+    publishes both, but the loader reaches for the ``.bin`` first. Default the
+    flag for the duration of the load, then put the method back.
+    """
+    try:
+        from transformers import PreTrainedModel
+    except ImportError:
+        yield
+        return
+    original = PreTrainedModel.from_pretrained.__func__
+
+    def patched(cls, *args, **kwargs):
+        kwargs.setdefault("use_safetensors", True)
+        return original(cls, *args, **kwargs)
+
+    PreTrainedModel.from_pretrained = classmethod(patched)
+    try:
+        yield
+    finally:
+        PreTrainedModel.from_pretrained = classmethod(original)
 
 
 @dataclass
@@ -38,8 +67,10 @@ class CharacterAlignmentScorer(Scorer):
 
     def __init__(self, model_name: str = "sapienzanlp/maverick-mes-litbank",
                  alpha: float = 0.5, context_window: int = 10,
-                 min_mentions: int = 1, cache_dir: str | None = "data/interim/coref"):
+                 min_mentions: int = 1, cache_dir: str | None = "data/interim/coref",
+                 device: str | None = None):
         self.model_name = model_name
+        self.device = device
         self.alpha = alpha
         self.context_window = context_window
         self.min_mentions = min_mentions
@@ -48,11 +79,37 @@ class CharacterAlignmentScorer(Scorer):
         self._cast_cache: dict[str, list[Character]] = {}
 
     def _load(self):
+        """Load the coreference model on a device that exists.
+
+        Maverick defaults to CUDA and passes ``map_location=self.device`` into
+        Lightning's ``load_from_checkpoint``, so on a CPU-only machine the
+        checkpoint fails to deserialize. Choose the device here rather than
+        inheriting that default.
+        """
         if self._model is None:
+            import torch
             from maverick import Maverick
 
-            self._model = Maverick(hf_name_or_path=self.model_name)
+            device = self.device or ("cuda" if torch.cuda.is_available() else "cpu")
+            with _prefer_safetensors():
+                self._model = self._construct(Maverick, device)
         return self._model
+
+    def _construct(self, Maverick, device):
+        try:
+            return Maverick(hf_name_or_path=self.model_name, device=device)
+        except TypeError:
+            # A maverick build whose constructor takes no device argument:
+            # force CPU deserialization by defaulting torch.load instead.
+            import functools
+            import torch
+            original = torch.load
+            torch.load = functools.partial(original,
+                                           map_location=torch.device(device))
+            try:
+                return Maverick(hf_name_or_path=self.model_name)
+            finally:
+                torch.load = original
 
     def cast(self, text: str) -> list[Character]:
         """Coreference chains for one story, cached by text."""

@@ -1,5 +1,23 @@
 # What actually makes two stories close
 
+> ## ⚠ Superseded in part — read this first
+>
+> This file is a snapshot from late October. The component table in it is
+> wrong in a specific way, and any summary built from this file will repeat
+> it:
+>
+> - **The figures 56.0 / 54.0 / 52.7 are not component accuracies.** They are
+>   per-component *right-closer rates* from the geometry notebook at n=150 —
+>   a distance statistic, not an accuracy. They were mislabelled.
+> - The real component accuracies, computed by `make components` over
+>   n=200, are **theme 55.0%, action 54.5%, outcome 54.0%**, every interval
+>   containing 50, with the component-wise combination at 53.00%.
+> - **The rank order of the three carries no information.** A one-point
+>   spread over 200 items is two items. An earlier reading treated the
+>   ordering as evidence the decomposition was real; it is not.
+>
+> `docs/EXPERIMENT_NARRATIVE.md` is the current account.
+
 Asked of the annotators rather than the models, on 30 October, by reading the
 226 free-text comments they left across the 600 labelled triples.
 

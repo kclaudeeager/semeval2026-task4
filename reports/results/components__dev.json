@@ -1,0 +1,56 @@
+{
+  "split": "dev",
+  "n": 200,
+  "components": {
+    "theme": {
+      "accuracy": 55.00000000000001,
+      "n": 200,
+      "wilson_low": 48.075488574571104,
+      "wilson_high": 61.73605136624569,
+      "aspect": "abstract_theme",
+      "strata": null
+    },
+    "action": {
+      "accuracy": 54.50000000000001,
+      "n": 200,
+      "wilson_low": 47.57848503696115,
+      "wilson_high": 61.25190090977398,
+      "aspect": "course_of_actions",
+      "strata": {
+        "marked": {
+          "k": 54,
+          "n": 88
+        },
+        "unmarked": {
+          "k": 10,
+          "n": 19
+        },
+        "diff": 8.732057416267946,
+        "z": 0.7040482013018108,
+        "p_value": 0.48140275643413716,
+        "direction": "as predicted"
+      }
+    },
+    "outcome": {
+      "accuracy": 54.0,
+      "n": 200,
+      "wilson_low": 47.08216309361468,
+      "wilson_high": 60.76706885903875,
+      "aspect": "outcomes",
+      "strata": {
+        "marked": {
+          "k": 21,
+          "n": 40
+        },
+        "unmarked": {
+          "k": 41,
+          "n": 71
+        },
+        "diff": -5.246478873239435,
+        "z": -0.5344347671672997,
+        "p_value": 0.5930407702879714,
+        "direction": "BACKWARDS"
+      }
+    }
+  }
+}

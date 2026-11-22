@@ -1,0 +1,51 @@
+{
+  "split": "dev",
+  "n": 200,
+  "spaces": {
+    "tfidf": {
+      "n": 200,
+      "right_median": 1.3940315777363672,
+      "wrong_median": 1.3952841262556683,
+      "difference": -0.001252548519301122,
+      "cos_right_median": 0.028337973794534177,
+      "cos_wrong_median": 0.026591075910918804,
+      "right_closer_k": 104,
+      "right_closer_pct": 52.0,
+      "right_closer_p": 0.6207289280968307,
+      "angle_median": 60.46344745545304,
+      "angle_null_orthogonal": 60.91718776852973,
+      "label": "TF-IDF, unit-normalized",
+      "model": null
+    },
+    "minilm": {
+      "n": 200,
+      "right_median": 1.1732920408248901,
+      "wrong_median": 1.1880689859390259,
+      "difference": -0.014776945114135742,
+      "cos_right_median": 0.31169289279880275,
+      "cos_wrong_median": 0.29424603680995176,
+      "right_closer_k": 110,
+      "right_closer_pct": 55.0,
+      "right_closer_p": 0.17896403953325127,
+      "angle_median": 61.34174950048721,
+      "angle_null_orthogonal": 73.5298558103114,
+      "label": "all-MiniLM-L6-v2",
+      "model": "sentence-transformers/all-MiniLM-L6-v2"
+    },
+    "e5": {
+      "n": 200,
+      "right_median": 0.6381654739379883,
+      "wrong_median": 0.6467409133911133,
+      "difference": -0.008575439453125,
+      "cos_right_median": 0.7963724047429945,
+      "cos_wrong_median": 0.7908630735132363,
+      "right_closer_k": 117,
+      "right_closer_pct": 58.5,
+      "right_closer_p": 0.019396944540338374,
+      "angle_median": 61.43400152123565,
+      "angle_null_orthogonal": null,
+      "label": "e5-base-v2",
+      "model": "intfloat/e5-base-v2"
+    }
+  }
+}

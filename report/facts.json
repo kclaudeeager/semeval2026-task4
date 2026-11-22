@@ -1,0 +1,428 @@
+{
+  "_README": "Figures that do not come from a scored run in reports/results/. Every entry needs a `source` saying where it can be re-derived. export_numbers.py turns each into a LaTeX macro of the same name and copies the source into a comment above it. Keys must be letters only (LaTeX macro names).",
+  "GeomRightMedian": {
+    "value": "1.390",
+    "source": "notebooks/03_eda_geometry.ipynb, cosine-distance cell",
+    "note": "median anchor-to-correct-candidate distance, MiniLM"
+  },
+  "GeomWrongMedian": {
+    "value": "1.391",
+    "source": "notebooks/03_eda_geometry.ipynb, cosine-distance cell",
+    "note": "median anchor-to-distractor distance; the two medians differ in the third decimal"
+  },
+  "GeomRightCloser": {
+    "value": "51",
+    "source": "notebooks/03_eda_geometry.ipynb cell 10, 76/150",
+    "note": "per cent of triples where the chosen candidate is the nearer one"
+  },
+  "GeomAngle": {
+    "value": "60.6",
+    "source": "notebooks/03_eda_geometry.ipynb cell 10",
+    "note": "MEDIAN angle in degrees between the two displacement vectors (not mean)"
+  },
+  "AnnThemePct": {
+    "value": "98.3",
+    "source": "majority of annotators marked the dimension; dev and test pooled, n=600. Verified by recomputation 17 Nov: 590/317/144 of 600 exactly",
+    "note": "per triple, majority rule. The three are independent checkboxes, so they do not sum to 100."
+  },
+  "AnnActionPct": {
+    "value": "52.8",
+    "source": "majority of annotators marked the dimension; dev and test pooled, n=600. Verified by recomputation 17 Nov: 590/317/144 of 600 exactly",
+    "note": "per triple, majority rule. The three are independent checkboxes, so they do not sum to 100."
+  },
+  "AnnOutcomePct": {
+    "value": "24.0",
+    "source": "majority of annotators marked the dimension; dev and test pooled, n=600. Verified by recomputation 17 Nov: 590/317/144 of 600 exactly",
+    "note": "per triple, majority rule. The three are independent checkboxes, so they do not sum to 100."
+  },
+  "AnnCommentCount": {
+    "value": "226",
+    "source": "notebooks/03_eda_geometry.ipynb, free-text comment count",
+    "note": "From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "AnnTripleCount": {
+    "value": "600",
+    "source": "sample + dev + test triples carrying annotator metadata",
+    "note": "From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "AnnProseThemePct": {
+    "value": "80.1",
+    "source": "notebooks/03_eda_geometry.ipynb, keyword scan of free-text comments",
+    "note": "theme language in the prose comments, as distinct from the checkbox flags From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "AnnProseCharPct": {
+    "value": "33.6",
+    "source": "notebooks/03_eda_geometry.ipynb, keyword scan of free-text comments",
+    "note": "From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "AnnProseSettingPct": {
+    "value": "10.6",
+    "source": "notebooks/03_eda_geometry.ipynb, keyword scan of free-text comments",
+    "note": "From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "AnnCommentWords": {
+    "value": "38",
+    "source": "notebooks/03_eda_geometry.ipynb, mean comment length",
+    "note": "From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "AnnStoryWords": {
+    "value": "116",
+    "source": "notebooks/03_eda_geometry.ipynb, mean summary length",
+    "note": "From the same notebook pass as the dimension counts, which did reproduce exactly; this figure has not itself been independently recomputed."
+  },
+  "JaccardMargin": {
+    "value": "-0.0024",
+    "source": "reports/results dev l0_jaccard margins, mean signed margin",
+    "note": "negative means the distractor shares more vocabulary with the anchor than the answer does"
+  },
+  "PowerStrataMDE": {
+    "value": "17.3",
+    "source": "scripts/power_analysis.py, between-strata contrast",
+    "note": "minimum detectable difference in percentage points for the best stratum pair"
+  },
+  "PowerStrataSmall": {
+    "value": "79",
+    "source": "scripts/power_analysis.py, unanimous outcomes strata on test"
+  },
+  "PowerStrataLarge": {
+    "value": "133",
+    "source": "scripts/power_analysis.py, unanimous outcomes strata on test"
+  },
+  "PowerPairedLo": {
+    "value": "4.3",
+    "source": "scripts/power_analysis.py, paired McNemar on 400 test items"
+  },
+  "PowerPairedHi": {
+    "value": "6.2",
+    "source": "scripts/power_analysis.py, paired McNemar on 400 test items"
+  },
+  "OfficialBestA": {
+    "value": "78.00",
+    "source": "Hatzel et al. 2026 task overview, Table 2 (COGNAC)"
+  },
+  "OfficialBestB": {
+    "value": "72.00",
+    "source": "Hatzel et al. 2026 task overview, Table 3 (COGNAC)"
+  },
+  "OfficialBaselineA": {
+    "value": "67.00",
+    "source": "Hatzel et al. 2026 task overview, zero-shot GPT-4o-mini baseline"
+  },
+  "OfficialMeanA": {
+    "value": "66.51",
+    "source": "computed here from the ranked Track A systems in Hatzel et al. 2026"
+  },
+  "OfficialRankedA": {
+    "value": "44",
+    "source": "Hatzel et al. 2026 task overview, ranked Track A systems"
+  },
+  "OfficialTeams": {
+    "value": "46",
+    "source": "Hatzel et al. 2026 task overview"
+  },
+  "OfficialRuns": {
+    "value": "71",
+    "source": "Hatzel et al. 2026 task overview"
+  },
+  "HumanBound": {
+    "value": "89",
+    "source": "Hatzel et al. 2026 task overview, estimated human upper bound"
+  },
+  "AlphaOverall": {
+    "value": "0.33",
+    "source": "Hatzel et al. 2026 task overview, Krippendorff alpha"
+  },
+  "AlphaPerDimLo": {
+    "value": "0.05",
+    "source": "Hatzel et al. 2026 task overview, per-dimension Krippendorff alpha"
+  },
+  "AlphaPerDimHi": {
+    "value": "0.11",
+    "source": "Hatzel et al. 2026 task overview, per-dimension Krippendorff alpha"
+  },
+  "StoryNetAcc": {
+    "value": "57.75",
+    "source": "Vijayachandran et al. 2026 (StoryNet) system paper"
+  },
+  "StoryNetRank": {
+    "value": "39",
+    "source": "Hatzel et al. 2026 task overview, Track A ranking"
+  },
+  "PublishedJaccardTest": {
+    "value": "56.25",
+    "source": "Hatzel et al. 2026 task overview, lexical baseline on test"
+  },
+  "PublishedTfidfTest": {
+    "value": "58.25",
+    "source": "Hatzel et al. 2026 task overview, lexical baseline on test"
+  },
+  "ChaturvediBefore": {
+    "value": "0.558",
+    "source": "Chaturvedi et al. 2018, precision at rank 1, event model"
+  },
+  "ChaturvediAfter": {
+    "value": "0.637",
+    "source": "Chaturvedi et al. 2018, precision at rank 1, character model"
+  },
+  "BarancovaGain": {
+    "value": "14.6",
+    "source": "Barancova and Sileno 2026, relative retrieval improvement, per cent"
+  },
+  "ElsnerSentimentOnly": {
+    "value": "50",
+    "source": "Elsner 2012, sentiment-trajectory-only accuracy",
+    "note": "VERIFY before use -- recheck the exact figure and page in the paper"
+  },
+  "GeomN": {
+    "value": "150",
+    "source": "notebooks/03_eda_geometry.ipynb cell 10",
+    "note": "the geometry analysis ran on 150 triples, NOT the full 200 dev split"
+  },
+  "GeomRightCloserK": {
+    "value": "76",
+    "source": "notebooks/03_eda_geometry.ipynb cell 10"
+  },
+  "GeomRightCloserP": {
+    "value": "0.93",
+    "source": "exact two-sided binomial on 76/150 against 0.5, computed in scripts",
+    "note": "this is the test that licenses the phrase 'no better than chance'"
+  },
+  "GeomDiff": {
+    "value": "-0.0008",
+    "source": "notebooks/03_eda_geometry.ipynb cell 10",
+    "note": "median(right) - median(wrong); negative means the chosen candidate is nearer, by 8 ten-thousandths"
+  },
+  "LFiveNInSample": {
+    "value": "59.00",
+    "source": "reports/archive/dev__l5_combined__over-L3n__IN-SAMPLE-NOT-CV.json",
+    "note": "weights fitted on dev and scored on dev; optimistic by an unknown amount. Limitations only, never the results table."
+  },
+  "StratThemeMarked": {
+    "value": "190",
+    "source": "partition of the dev split on 'abstract_theme', annotator labels only (no model)"
+  },
+  "StratThemeUnmarked": {
+    "value": "0",
+    "source": "partition of the dev split on 'abstract_theme', annotator labels only (no model)"
+  },
+  "StratActionMarked": {
+    "value": "88",
+    "source": "partition of the dev split on 'course_of_actions', annotator labels only (no model)"
+  },
+  "StratActionUnmarked": {
+    "value": "19",
+    "source": "partition of the dev split on 'course_of_actions', annotator labels only (no model)"
+  },
+  "StratOutcomeMarked": {
+    "value": "40",
+    "source": "partition of the dev split on 'outcomes', annotator labels only (no model)"
+  },
+  "StratOutcomeUnmarked": {
+    "value": "71",
+    "source": "partition of the dev split on 'outcomes', annotator labels only (no model)"
+  },
+  "AnnDimsPerJudgment": {
+    "value": "2.08",
+    "source": "computed from the dev split: mean number of the three dimensions ticked per annotator judgment",
+    "note": "why the rates sum to about 200 per cent"
+  },
+  "AnnThemeJudgPct": {
+    "value": "97.7",
+    "source": "computed from the dev split: share of individual annotator judgments ticking this dimension (434 judgments)",
+    "note": "per judgment, not per triple"
+  },
+  "AnnActionJudgPct": {
+    "value": "68.2",
+    "source": "computed from the dev split: share of individual annotator judgments ticking this dimension (434 judgments)",
+    "note": "per judgment, not per triple"
+  },
+  "AnnOutcomeJudgPct": {
+    "value": "41.7",
+    "source": "computed from the dev split: share of individual annotator judgments ticking this dimension (434 judgments)",
+    "note": "per judgment, not per triple"
+  },
+  "AnnPoolN": {
+    "value": "600",
+    "source": "dev (200) + test (400) triples, the pool the majority-rule rates are computed over"
+  },
+  "AnnotTotal": {
+    "value": "1,237",
+    "source": "Hatzel et al. 2026 task overview, annotation pipeline",
+    "note": "triples that reached human annotation, i.e. the LLM-disagreement set"
+  },
+  "AnnotAgreed": {
+    "value": "831",
+    "source": "Hatzel et al. 2026 task overview, annotation pipeline",
+    "note": "triples where the two annotators agreed"
+  },
+  "AnnotAdjudicated": {
+    "value": "208",
+    "source": "Hatzel et al. 2026 task overview, annotation pipeline",
+    "note": "further triples settled by a third annotator"
+  },
+  "AnnotKept": {
+    "value": "1,039",
+    "source": "Hatzel et al. 2026 task overview, annotation pipeline",
+    "note": "labelled triples in the released data"
+  },
+  "AnnotAgreePct": {
+    "value": "67",
+    "source": "Hatzel et al. 2026 task overview, annotation pipeline",
+    "note": "per cent of annotated triples where two annotators agreed (831/1,237); computed here"
+  },
+  "AnnotDropped": {
+    "value": "198",
+    "source": "derived, not reported: Hatzel et al. 2026 give 1,237 annotated and 1,039 kept, so 198 were not carried forward",
+    "note": "triples never resolved and dropped (1,237 - 831 - 208); computed here"
+  },
+  "PhiNullLo": {
+    "value": "-0.14",
+    "source": "permutation test computed here: one layer's per-item error vector shuffled 4,000 times with its accuracy held fixed, phi recomputed each time",
+    "note": "2.5th percentile of the null distribution"
+  },
+  "PhiNullHi": {
+    "value": "+0.14",
+    "source": "permutation test computed here: one layer's per-item error vector shuffled 4,000 times with its accuracy held fixed, phi recomputed each time",
+    "note": "97.5th percentile"
+  },
+  "PhiNullPLTwo": {
+    "value": "0.021",
+    "source": "permutation test computed here: one layer's per-item error vector shuffled 4,000 times with its accuracy held fixed, phi recomputed each time; L2 against TF-IDF"
+  },
+  "PhiNullPLThreeX": {
+    "value": "0.001",
+    "source": "permutation test computed here: one layer's per-item error vector shuffled 4,000 times with its accuracy held fixed, phi recomputed each time; L3x against TF-IDF"
+  },
+  "TfidfWrongN": {
+    "value": "99",
+    "source": "computed: items the TF-IDF baseline gets wrong on dev"
+  },
+  "RecoverLTwo": {
+    "value": "50",
+    "source": "computed: of the 99 items TF-IDF gets wrong on dev, the number this layer gets right"
+  },
+  "RecoverLThreeN": {
+    "value": "42",
+    "source": "computed: of the 99 items TF-IDF gets wrong on dev, the number this layer gets right"
+  },
+  "DistractorPercentile": {
+    "value": "98th to 99th",
+    "source": "Hatzel et al. 2026 task overview: the similarity percentile band the distractor is drawn from"
+  },
+  "ExampleCastFull": {
+    "value": "59",
+    "source": "scripts/examples.py, development triple 0: noun-chunk heads before filtering"
+  },
+  "ExampleCastActors": {
+    "value": "21",
+    "source": "scripts/examples.py, development triple 0: heads surviving the actors-only filter"
+  },
+  "WeightRangeLTwo": {
+    "value": "0.2 to 0.6",
+    "source": "reports/results/dev__l5_combined: per-fold weight on l2_e5 across 5 cross-validation folds"
+  },
+  "WeightRangeLThreeX": {
+    "value": "0.0 to 0.4",
+    "source": "reports/results/dev__l5_combined: per-fold weight on l3x_characters_embed across 5 cross-validation folds"
+  },
+  "WeightRangeLFourX": {
+    "value": "0.0 to 0.7",
+    "source": "reports/results/dev__l5_combined: per-fold weight on l4x_roles_embed across 5 cross-validation folds"
+  },
+  "BestSingleAcc": {
+    "value": "58.50",
+    "source": "computed: highest dev accuracy of any single layer (l2_e5 and l3x actors both reach it)"
+  },
+  "CombinationLoss": {
+    "value": "2.50",
+    "source": "computed: best single layer minus the cross-validated combination"
+  },
+  "OracleShortfall": {
+    "value": "12.6",
+    "source": "computed: independence expectation minus observed union, five-layer pool"
+  },
+  "OracleResidue": {
+    "value": "14.0",
+    "source": "computed: per cent of dev items no layer in the five-layer pool gets right"
+  },
+  "LexTestCrossEntPct": {
+    "value": "49.0",
+    "source": "scripts/lexical_direction.py on test, content words, cross_entropy"
+  },
+  "LexTestCrossEntP": {
+    "value": "0.73",
+    "source": "scripts/lexical_direction.py on test, content words, cross_entropy"
+  },
+  "LexTestEditPct": {
+    "value": "45.8",
+    "source": "scripts/lexical_direction.py on test, content words, edit_distance"
+  },
+  "LexTestEditP": {
+    "value": "0.10",
+    "source": "scripts/lexical_direction.py on test, content words, edit_distance"
+  },
+  "FreezeSha": {
+    "value": "a9b9881",
+    "source": "git rev-parse --short HEAD at the freeze"
+  },
+  "LFiveCorefWeights": {
+    "value": "1.0, 0.0, 0.0",
+    "source": "reports/results test l5_combined over the coreference variants: weights fitted on dev"
+  },
+  "LFiveTestWeights": {
+    "value": "0.3, 0.0, 0.7",
+    "source": "reports/results test l5_combined over L3x/L4x: weights fitted on dev"
+  },
+  "SrlArgMatchLLM": {
+    "value": "48.6",
+    "source": "Bonn et al. 2024: SRL by LLM prompt, argument match"
+  },
+  "SrlArgMatchHuman": {
+    "value": "88.3",
+    "source": "Bonn et al. 2024: human argument match, same evaluation"
+  },
+  "GrammarWeight": {
+    "value": "0.40",
+    "source": "CascadeMind system description via Hatzel et al. 2026: learned weight on the five-phase story grammar"
+  },
+  "TfidfWeight": {
+    "value": "0.49",
+    "source": "CascadeMind system description via Hatzel et al. 2026: learned weight on TF-IDF"
+  },
+  "EmbedWeight": {
+    "value": "0.08",
+    "source": "CascadeMind system description via Hatzel et al. 2026: learned weight on embeddings"
+  },
+  "ArcWeight": {
+    "value": "0.02",
+    "source": "CascadeMind system description via Hatzel et al. 2026: learned weight on the tension curve"
+  },
+  "SegPadPct": {
+    "value": "26",
+    "source": "computed from the 600 dev summaries: share with fewer than 5 sentences, which split_segments pads with a repeated sentence"
+  },
+  "SegMedianSents": {
+    "value": "6",
+    "source": "computed from the 600 dev summaries: median sentence count"
+  },
+  "ExampleJaccardRight": {
+    "value": "0.0763",
+    "source": "scripts/examples.py, development triple 160: Jaccard against the anchor over the L0 tokenizer (candidate chosen by annotators)"
+  },
+  "ExampleJaccardWrong": {
+    "value": "0.1515",
+    "source": "scripts/examples.py, development triple 160: Jaccard against the anchor over the L0 tokenizer (distractor)"
+  },
+  "ExampleJaccardGap": {
+    "value": "0.0752",
+    "source": "scripts/examples.py, development triple 160: Jaccard against the anchor over the L0 tokenizer (margin by which overlap prefers the distractor)"
+  },
+  "ExampleCastRemoved": {
+    "value": "38",
+    "source": "scripts/examples.py, development triple 0: noun heads discarded by the actors-only filter"
+  },
+  "TrackAKept": {
+    "value": "639",
+    "source": "Hatzel et al. 2026: the 1,039 kept triples span both tracks; Track A receives 39 sample + 200 dev + 400 test"
+  }
+}

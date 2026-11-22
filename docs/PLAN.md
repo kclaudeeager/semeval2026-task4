@@ -75,8 +75,10 @@ so 29 days. One milestone per week, each ending in something committed.
   reports 49.0% on dev; that vectorizer was fitted over dev *and* test. Fitted on
   dev alone, as `configs/data/dev.yaml` now requires, it is **51.50%**. Use the
   new number in the report and say why it moved.
-- **The seven-item Jaccard gap** (58.00 measured against 56.25 published) is still
-  unexplained. Likely tokenization. Resolve it in Week 1 or report it as open.
+- ~~**The seven-item Jaccard gap** (58.00 measured against 56.25 published) is
+  still unexplained. Likely tokenization.~~ **Resolved 21 Nov:** apostrophe
+  handling in the tokenizer; see `scripts/tokenizer_reconciliation.py` and the
+  data section. Reported, not corrected.
 - **Abstract theme stays out of the diagnostic**: every annotator marked it on
   392 of 400 test items, so it has no contrast to measure.
 

@@ -8,7 +8,9 @@ PY   := $(VENV)/bin/python
 # Empty on every other platform.
 KEEPAWAKE := $(shell command -v caffeinate >/dev/null 2>&1 && echo "caffeinate -i")
 
-.PHONY: help setup data test ablation diagnostic lint clean
+.PHONY: ablation audit check clean components coref data diagnostic doctor geometry help lint models numbers reconcile report restore rhythm runs setup summary test
+# `report` and `docs` match real DIRECTORIES, so without .PHONY make
+# reports them up to date and runs nothing.
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "};{printf "  %-12s %s\n", $$1, $$2}'
 
@@ -53,3 +55,39 @@ lint:       ## style check
 
 clean:      ## remove run outputs, keep results
 	rm -rf outputs multirun .pytest_cache src/*.egg-info
+
+numbers:    ## regenerate report/numbers.tex from reports/results/*.json
+	$(PY) scripts/export_numbers.py
+
+reconcile:  ## explain the L0 baseline gap against the published figure
+	TASK4_ALLOW_TEST=1 $(PY) scripts/tokenizer_reconciliation.py
+
+check:      ## flag any figure typed by hand into report/report.tex
+	$(PY) scripts/export_numbers.py --check
+
+report:     ## numbers, then build report/report.pdf
+	$(PY) scripts/export_numbers.py
+	cd report && latexmk -pdf -interaction=nonstopmode report.tex
+
+geometry:   ## triple geometry in every space (TF-IDF, MiniLM, e5)
+	$(PY) scripts/triple_geometry.py dev
+	$(PY) scripts/export_numbers.py
+
+audit:      ## verify every reported claim a second way
+	$(PY) scripts/audit.py
+
+restore:    ## put the environment back on its pinned versions (run this after any bad install)
+	@echo "The version pins live in the [embeddings] extra, so BOTH extras"
+	@echo "must be installed together or numpy/transformers float free."
+	VIRTUAL_ENV=$(VENV) uv pip install -e ".[embeddings,structure,dev]"
+	$(PY) scripts/doctor.py
+
+coref:      ## run the two coreference layers (L3, L4). Needs `make restore` to pass first.
+	@$(PY) -c "import torch, transformers, numpy; \
+	  assert numpy.__version__.startswith('1.'), f'numpy {numpy.__version__}: run make restore'; \
+	  assert int(transformers.__version__.split('.')[0]) < 5, f'transformers {transformers.__version__}: run make restore'; \
+	  print(f'environment ok: torch {torch.__version__}, transformers {transformers.__version__}, numpy {numpy.__version__}')"
+	$(KEEPAWAKE) $(PY) -m task4.cli scorer=l3_characters data=dev
+	$(KEEPAWAKE) $(PY) -m task4.cli scorer=l4_roles data=dev
+	$(PY) scripts/export_numbers.py
+	$(PY) scripts/audit.py

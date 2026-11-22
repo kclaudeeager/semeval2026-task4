@@ -6,6 +6,41 @@ adds one interpretable representation, and the question is whether character and
 role structure contributes anything beyond dense embeddings on triples that were
 selected because two language models disagreed about them.
 
+## Verifying the report
+
+Everything in `report/report.pdf` can be recomputed from this repository. No
+figure in the report is typed by hand: each is a LaTeX macro generated from a
+stored result, and `report/PROVENANCE.md` records where each one came from.
+
+```bash
+make setup      # venv + install
+make data       # unpack the Task 4 release into data/raw (not redistributed here)
+make test       # unit tests
+make audit      # recompute every claim in the report a second way
+make numbers    # regenerate report/numbers.tex from reports/results/*.json
+make check      # fail if any figure was typed into the prose by hand
+make report     # build report/report.pdf
+```
+
+`make audit` is the one that matters. It re-derives the accuracies, the paired
+tests, the error correlations and the baseline reconciliation from the stored
+per-item outcomes, using independent code paths, and fails loudly on any
+disagreement. A clean run prints 14 passing checks.
+
+`docs/PREREGISTRATION.md` fixes the confirmatory claim, the layers to be run and
+the exploratory measures **before** the test split was touched. The
+configuration was frozen at commit `a9b9881`; every commit after that one
+changes analysis, reporting or documentation only, never a scorer or an
+evaluation path. `TASK4_ALLOW_TEST=1` is required to touch the test split at
+all.
+
+## Adding a layer
+
+A layer is a `Scorer` subclass registered under a name, plus a YAML file in
+`configs/scorer/`. Nothing in the harness, the statistics or the reporting
+needs to change, so a new layer is immediately comparable with every existing
+one and will appear in `make ablation` and `make audit`.
+
 ## Why the layout looks like this
 
 Comparisons go through configuration, never through edited code. Every layer
@@ -15,7 +50,7 @@ registered under a name. A run names a layer, a split and an eval profile:
 ```bash
 make setup                                   # venv outside OneDrive + install
 make data                                    # unpack the release into data/raw
-make test                                    # 24 tests, no network needed
+make test                                    # unit tests, no network needed
 python -m task4.cli scorer=l1_tfidf data=dev # one layer, one split
 make ablation                                # every runnable layer, swept over dev
 ```

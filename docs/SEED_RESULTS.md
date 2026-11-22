@@ -1,5 +1,21 @@
 # Seed results, 28 October
 
+> ## ⚠ Superseded in part — read this first
+>
+> This file is a snapshot from late October. Two figures in it are no longer
+> live results, and any summary built from this file will repeat them:
+>
+> - **59.00% for the L5 fitted combination is an in-sample number.** Weights
+>   were selected on dev and the same split was scored. It has been moved to
+>   `reports/archive/` and `make audit` fails if it reappears among live
+>   results. The cross-validated combination scores **56.00%**, below the L2
+>   backbone. Against L2 the in-sample figure is +0.50 points at p = 1.000.
+> - **"None of the gaps is significant" understates it.** Nothing in the
+>   ablation reaches p < 0.05 at all, including the largest effect
+>   (TF-IDF to e5, +8.00 points, p = 0.10).
+>
+> `docs/EXPERIMENT_NARRATIVE.md` is the current account.
+
 Run four weeks before the deadline, deliberately, to find out what breaks while
 there is still time to change course.
 

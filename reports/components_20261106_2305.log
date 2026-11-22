@@ -1,0 +1,103 @@
+### PHASE 1 - is the decomposition real?
+dev: 200 triples
+
+Each component is run alone. First its accuracy on the whole split,
+then split by whether annotators marked the matching aspect: a real
+component scores higher where it was marked.
+
+=== component 'theme'  vs aspect 'abstract_theme' ===
+    overall                      55.00% [48.08, 61.74]   n=200   AT CHANCE
+    cannot test strata: 190 and 0
+
+=== component 'action'  vs aspect 'course_of_actions' ===
+    overall                      54.50% [47.58, 61.25]   n=200   AT CHANCE
+    where annotators marked it   61.36% [50.92, 70.86]   n=88
+    where they did not           52.63% [31.71, 72.67]   n=19
+    difference +8.7 pts   z=+0.70  p=0.481   as predicted
+
+=== component 'outcome'  vs aspect 'outcomes' ===
+    overall                      54.00% [47.08, 60.77]   n=200   AT CHANCE
+    where annotators marked it   52.50% [37.50, 67.06]   n=40
+    where they did not           57.75% [46.15, 68.55]   n=71
+    difference -5.2 pts   z=-0.53  p=0.593   BACKWARDS
+
+Read the direction before the p-value. These strata are small, so a
+non-significant difference in the right direction is weak support, and
+a difference in the wrong direction is a problem whatever its p-value.
+
+wrote reports/results/components__dev.json
+Now run: make numbers
+
+### PHASE 2 - does comparing component-wise help?
+[2026-11-06 23:10:13,233][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:10:13,384][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:11:29,483][__main__][INFO] - l7s_single_component dev   n=200  acc=55.00% CI [48.00, 61.50] -> dev__l7s_single_component__29da6df7.json
+    l7s_single_component dev   n=200  acc=55.00% CI [48.00, 61.50] -> dev__l7s_single_component__29da6df7.json
+[2026-11-06 23:11:42,541][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:11:42,724][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:13:07,548][__main__][INFO] - l7s_single_component dev   n=200  acc=54.50% CI [47.50, 61.00] -> dev__l7s_single_component__ac5f3772.json
+    l7s_single_component dev   n=200  acc=54.50% CI [47.50, 61.00] -> dev__l7s_single_component__ac5f3772.json
+[2026-11-06 23:13:21,603][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:13:21,806][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:14:40,714][__main__][INFO] - l7s_single_component dev   n=200  acc=54.00% CI [47.00, 60.50] -> dev__l7s_single_component__2d379789.json
+    l7s_single_component dev   n=200  acc=54.00% CI [47.00, 60.50] -> dev__l7s_single_component__2d379789.json
+[2026-11-06 23:14:55,686][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:14:55,857][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:16:21,765][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:16:21,871][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:17:47,748][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:17:47,846][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:18:56,677][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:18:56,778][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:20:14,556][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:20:14,654][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:21:38,174][__main__][INFO] - cross-validated over 5 folds (fit split == eval split)
+[2026-11-06 23:21:38,188][__main__][INFO] - l7_components    dev   n=200  acc=53.00% CI [46.50, 60.00] -> dev__l7_components__e787bd4b.json
+    l7_components    dev   n=200  acc=53.00% CI [46.50, 60.00] -> dev__l7_components__e787bd4b.json
+
+fitted component weights: {'per_fold': [{'components': ['theme', 'action', 'outcome'], 'weights': [0.1, 0.5, 0.4]}, {'components': ['theme', 'action', 'outcome'], 'weights': [0.2, 0.5, 0.3]}, {'components': ['theme', 'action', 'outcome'], 'weights': [0.2, 0.1, 0.7]}, {'components': ['theme', 'action', 'outcome'], 'weights': [0.2, 0.5, 0.3]}, {'components': ['theme', 'action', 'outcome'], 'weights': [0.0, 0.5, 0.5]}]}
+DEV RESULTS
+  l5_combined/over-L3n                    59.00  [ 52.0, 66.0]
+  l2_e5                                   58.50  [ 52.0, 65.5]
+  l3x_characters_embed/actors/MiniLM      58.50  [ 52.0, 65.5]
+  l3x_characters_embed/all-nouns/MiniLM   58.00  [ 51.0, 65.0]
+  l4x_roles_embed/actors/MiniLM           57.50  [ 50.5, 64.5]
+  l3n_characters_nocoref/all-nouns        57.00  [ 50.0, 63.5]
+  l4x_roles_embed/all-nouns/MiniLM        57.00  [ 50.0, 64.0]
+  l3x_characters_embed/all-nouns/e5-base-v2  56.00  [ 48.5, 63.0]
+  l4n_roles_nocoref/all-nouns             56.00  [ 49.0, 63.0]
+  l5_combined/over-L3x                    56.00  [ 49.5, 63.0] (cross-validated)
+  l7s_single_component/MiniLM             54.50  [ 47.5, 61.0]
+  l4n_roles_nocoref/actors                53.50  [ 47.0, 60.0]
+  l7_components/MiniLM                    53.00  [ 46.5, 60.0] (cross-validated)
+  l3n_characters_nocoref/actors           52.50  [ 45.5, 59.5]
+  l1_tfidf                                50.50  [ 43.5, 57.5] (cross-validated)
+  l0_random                               46.00  [ 39.5, 52.5]
+  l0_jaccard                              45.00  [ 38.0, 52.0]
+
+THE COMPARISON THAT ISOLATES ONE VARIABLE
+  l3n_characters_nocoref/all-nouns  
+    -> l3x_characters_embed/all-nouns/MiniLM  +1.00 pts  p=0.907  not significant
+  l3n_characters_nocoref/actors     
+    -> l3x_characters_embed/actors/MiniLM  +6.00 pts  p=0.224  not significant
+  l4n_roles_nocoref/actors          
+    -> l4x_roles_embed/actors/MiniLM     +4.00 pts  p=0.382  not significant
+  l4n_roles_nocoref/all-nouns       
+    -> l4x_roles_embed/all-nouns/MiniLM  +1.00 pts  p=0.896  not significant
+  l2_e5                             
+    -> l3x_characters_embed/actors/MiniLM  +0.00 pts  p=0.901  not significant
+  l2_e5                             
+    -> l5_combined/over-L3n              +0.50 pts  p=1.000  not significant
+  l5_combined/over-L3n              
+    -> l5_combined/over-L3x              -3.00 pts  p=0.488  not significant
+
+STILL LEXICAL? error correlation with TF-IDF (was +0.27 for L3n)
+  l3n_characters_nocoref/actors          phi=+0.300
+  l3n_characters_nocoref/all-nouns       phi=+0.291
+  l3x_characters_embed/actors/MiniLM     phi=+0.222
+  l3x_characters_embed/all-nouns/MiniLM  phi=+0.252
+  l3x_characters_embed/all-nouns/e5-base-v2 phi=+0.271
+  l4n_roles_nocoref/actors               phi=+0.280
+  l4n_roles_nocoref/all-nouns            phi=+0.331
+  l4x_roles_embed/actors/MiniLM          phi=+0.221
+  l4x_roles_embed/all-nouns/MiniLM       phi=+0.271

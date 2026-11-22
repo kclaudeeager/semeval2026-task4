@@ -1,0 +1,156 @@
+### PHASE 1 - is the decomposition real?
+dev: 200 triples
+
+Each component is run alone. First its accuracy on the whole split,
+then split by whether annotators marked the matching aspect: a real
+component scores higher where it was marked.
+
+Traceback (most recent call last):
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/scripts/validate_components.py", line 109, in <module>
+    main(sys.argv[1] if len(sys.argv) > 1 else "dev")
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/scripts/validate_components.py", line 63, in main
+    lo, hi = wilson(k_all, n_all)
+    ^^^^^^
+TypeError: cannot unpack non-iterable Interval object
+
+### PHASE 2 - does comparing component-wise help?
+[2026-11-06 22:57:30,213][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 22:57:30,414][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 22:59:22,803][__main__][INFO] - l7s_single_component dev   n=200  acc=55.00% CI [48.00, 61.50] -> dev__l7s_single_component__29da6df7.json
+    l7s_single_component dev   n=200  acc=55.00% CI [48.00, 61.50] -> dev__l7s_single_component__29da6df7.json
+[2026-11-06 22:59:46,392][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 22:59:46,593][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:01:44,559][__main__][INFO] - l7s_single_component dev   n=200  acc=54.50% CI [47.50, 61.00] -> dev__l7s_single_component__ac5f3772.json
+    l7s_single_component dev   n=200  acc=54.50% CI [47.50, 61.00] -> dev__l7s_single_component__ac5f3772.json
+[2026-11-06 23:02:01,640][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:02:01,895][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+[2026-11-06 23:04:00,484][__main__][INFO] - l7s_single_component dev   n=200  acc=54.00% CI [47.00, 60.50] -> dev__l7s_single_component__2d379789.json
+    l7s_single_component dev   n=200  acc=54.00% CI [47.00, 60.50] -> dev__l7s_single_component__2d379789.json
+[2026-11-06 23:04:14,123][sentence_transformers.base.model][INFO] - No device provided, using cpu
+[2026-11-06 23:04:14,333][sentence_transformers.base.model][INFO] - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/cli.py", line 66, in <module>
+    main()
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/main.py", line 94, in decorated_main
+    _run_hydra(
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/_internal/utils.py", line 394, in _run_hydra
+    _run_app(
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/_internal/utils.py", line 457, in _run_app
+    run_and_report(
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
+    return func()
+           ^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/_internal/utils.py", line 458, in <lambda>
+    lambda: hydra.run(
+            ^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/_internal/hydra.py", line 119, in run
+    ret = run_job(
+          ^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/hydra/core/utils.py", line 189, in run_job
+    ret.return_value = task_function(task_cfg)
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/cli.py", line 55, in main
+    result = _run_one(cfg, cfg.scorer.name, params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/cli.py", line 25, in _run_one
+    result = evaluate_cv(lambda: build(name, **params), triples, cfg.data.split,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/evaluate.py", line 114, in evaluate_cv
+    for i, p in zip(folds[f], model.predict(test_rows)):
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/scorers/base.py", line 41, in predict
+    return [a >= b for a, b in self.score_pairs(triples)]
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/scorers/base.py", line 51, in score_pairs
+    return [(self.score(t.anchor, t.text_a), self.score(t.anchor, t.text_b))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/scorers/componentwise.py", line 98, in score
+    return sum(wi * s for wi, s in zip(w, self.similarities(anchor, candidate)))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/scorers/componentwise.py", line 68, in similarities
+    A, B = self.parts(anchor), self.parts(candidate)
+                               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/UIC/courses/NLP/Projects/semeval2026-task4/src/task4/scorers/componentwise.py", line 57, in parts
+    vecs = self._encoder().encode(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 115, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/sentence_transformers/util/decorators.py", line 41, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/sentence_transformers/sentence_transformer/model.py", line 662, in encode
+    out_features = self(features, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/sentence_transformers/base/model.py", line 517, in forward
+    input = module(input, **module_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/sentence_transformers/base/modules/transformer.py", line 1196, in forward
+    model_output = model_method(**filtered_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/models/bert/modeling_bert.py", line 1000, in forward
+    encoder_outputs = self.encoder(
+                      ^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/models/bert/modeling_bert.py", line 650, in forward
+    layer_outputs = layer_module(
+                    ^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/modeling_layers.py", line 94, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/utils/deprecation.py", line 172, in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/models/bert/modeling_bert.py", line 588, in forward
+    layer_output = apply_chunking_to_forward(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/pytorch_utils.py", line 257, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/models/bert/modeling_bert.py", line 596, in feed_forward_chunk
+    intermediate_output = self.intermediate(attention_output)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/models/bert/modeling_bert.py", line 513, in forward
+    hidden_states = self.intermediate_act_fn(hidden_states)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.venvs/task4/lib/python3.12/site-packages/transformers/activations.py", line 85, in forward
+    return self.act(input)
+           ^^^^^^^^^^^^^^^
+KeyboardInterrupt

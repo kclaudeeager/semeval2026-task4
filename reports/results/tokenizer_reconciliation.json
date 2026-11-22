@@ -1,0 +1,203 @@
+{
+  "published_test": 56.25,
+  "current": "apostrophe_kept",
+  "reference": "word_chars",
+  "splits": {
+    "dev": {
+      "apostrophe_kept": {
+        "k": 90,
+        "n": 200,
+        "accuracy": 45.0,
+        "ties": 0
+      },
+      "word_chars": {
+        "k": 92,
+        "n": 200,
+        "accuracy": 46.0,
+        "ties": 0
+      },
+      "whitespace": {
+        "k": 89,
+        "n": 200,
+        "accuracy": 44.5,
+        "ties": 1
+      },
+      "alphabetic": {
+        "k": 92,
+        "n": 200,
+        "accuracy": 46.0,
+        "ties": 1
+      },
+      "case_sensitive": {
+        "k": 95,
+        "n": 200,
+        "accuracy": 47.5,
+        "ties": 2
+      },
+      "apostrophe_dropped": {
+        "k": 92,
+        "n": 200,
+        "accuracy": 46.0,
+        "ties": 1
+      },
+      "whitespace_cased": {
+        "k": 94,
+        "n": 200,
+        "accuracy": 47.0,
+        "ties": 0
+      },
+      "stopworded": {
+        "k": 90,
+        "n": 200,
+        "accuracy": 45.0,
+        "ties": 0
+      },
+      "stopworded_word_chars": {
+        "k": 88,
+        "n": 200,
+        "accuracy": 44.0,
+        "ties": 0
+      },
+      "stopworded_stemmed": {
+        "k": 89,
+        "n": 200,
+        "accuracy": 44.5,
+        "ties": 0
+      }
+    },
+    "test": {
+      "apostrophe_kept": {
+        "k": 232,
+        "n": 400,
+        "accuracy": 58.0,
+        "ties": 2
+      },
+      "word_chars": {
+        "k": 225,
+        "n": 400,
+        "accuracy": 56.25,
+        "ties": 3
+      },
+      "whitespace": {
+        "k": 225,
+        "n": 400,
+        "accuracy": 56.25,
+        "ties": 0
+      },
+      "alphabetic": {
+        "k": 225,
+        "n": 400,
+        "accuracy": 56.25,
+        "ties": 2
+      },
+      "case_sensitive": {
+        "k": 225,
+        "n": 400,
+        "accuracy": 56.25,
+        "ties": 2
+      },
+      "apostrophe_dropped": {
+        "k": 224,
+        "n": 400,
+        "accuracy": 56.0,
+        "ties": 2
+      },
+      "whitespace_cased": {
+        "k": 234,
+        "n": 400,
+        "accuracy": 58.5,
+        "ties": 2
+      },
+      "stopworded": {
+        "k": 228,
+        "n": 400,
+        "accuracy": 57.0,
+        "ties": 1
+      },
+      "stopworded_word_chars": {
+        "k": 226,
+        "n": 400,
+        "accuracy": 56.5,
+        "ties": 2
+      },
+      "stopworded_stemmed": {
+        "k": 220,
+        "n": 400,
+        "accuracy": 55.0,
+        "ties": 0
+      }
+    }
+  },
+  "vocabulary": {
+    "types": 930,
+    "occurrences": 1917,
+    "apostrophe_occurrences": 1432,
+    "apostrophe_pct": 74.7,
+    "most_common": [
+      [
+        "father's",
+        39
+      ],
+      [
+        "wife's",
+        35
+      ],
+      [
+        "he's",
+        27
+      ],
+      [
+        "e",
+        26
+      ],
+      [
+        "fianc",
+        26
+      ],
+      [
+        "sarah's",
+        24
+      ],
+      [
+        "paris's",
+        23
+      ],
+      [
+        "mother's",
+        19
+      ],
+      [
+        "son's",
+        19
+      ],
+      [
+        "doesn't",
+        18
+      ],
+      [
+        "l",
+        17
+      ],
+      [
+        "don't",
+        17
+      ]
+    ]
+  },
+  "flips": {
+    "changed": 17,
+    "current_right": 12,
+    "current_wrong": 5
+  },
+  "gap_points": 1.75,
+  "gap_items": 7,
+  "matching_variants": [
+    "alphabetic",
+    "case_sensitive",
+    "whitespace",
+    "word_chars"
+  ],
+  "dev_variant_min": 44.0,
+  "dev_variant_max": 47.5,
+  "dev_all_below_chance": true
+}

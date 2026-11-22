@@ -1,0 +1,678 @@
+% ===========================================================================
+% CS 421 final report -- SemEval-2026 Task 4, Track A
+%
+% HOW THIS FILE WORKS
+%   Every number in the prose is a macro from numbers.tex, which is
+%   generated from reports/results/*.json and report/facts.json.
+%   Never type a figure directly into a sentence. If a number has no macro,
+%   add the run to the RUNS table in scripts/export_numbers.py, or add the
+%   figure to report/facts.json with its source.
+%
+%   make numbers   regenerate numbers.tex
+%   make report    regenerate numbers.tex, then build report.pdf
+%   make check     flag any figure typed directly into this file
+%
+% FORMAT (from report_and_walkthrough.pdf)
+%   PDF, MAXIMUM SIX PAGES excluding references. Font >= 11pt, letter.
+%   Over-length submissions are graded only to the maximum.
+%   Section order follows the six graded items:
+%     1 Task and Setup 12 | 2 Data 12 | 3 Approach 22
+%     4 Results 17 | 5 Analysis 27 | 6 Ethics and Limitations 10
+% ===========================================================================
+\documentclass[11pt,letterpaper,twocolumn]{article}
+\usepackage[top=0.75in,bottom=0.75in,left=0.7in,right=0.7in]{geometry}
+\setlength{\columnsep}{0.22in}
+\usepackage{balance}   % even columns on the last page
+\usepackage{times}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage[round]{natbib}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{6pt}{1.5pt}
+\titlespacing*{\subsection}{0pt}{4pt}{0.5pt}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\setlist[enumerate]{leftmargin=1.4em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\graphicspath{{../reports/figures/}}
+% Float placement: without these, full-width floats push text onto new pages
+% and the two-column gain disappears.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+
+\input{numbers}
+
+\title{\vspace{-2em}\textbf{Does Narrative Structure Help Where Words Do Not?}\\[2pt]
+\normalsize A Layered Ablation on SemEval-2026 Task 4, Track A}
+\author{Claude Kwizera \\ \small CS 421: Natural Language Processing \\
+\small University of Illinois Chicago}
+\date{\small November 25, 2026}
+
+\begin{document}
+\twocolumn[
+\begin{@twocolumnfalse}
+\maketitle
+
+% ---------------------------------------------------------------------------
+% ABSTRACT
+%   CLAIM    Structure did not add signal, and the reason is measurable.
+%   BUDGET   140-170 words. Write this last; revise it first.
+% ---------------------------------------------------------------------------
+\begin{abstract}
+\noindent
+SemEval-2026 Task~4 asks which of two story summaries is more similar to an  % ok
+anchor. Because the triples that survive annotation are selected to defeat
+surface overlap, a Jaccard baseline scores \JaccardAcc\% on development data,
+below chance. This report asks whether narrative structure supplies the signal
+that wording does not, through an ablation in which each layer adds one
+representation. No layer separates from any other on development data, and on the held-out
+split the embedding backbone leads the best structural layer,
+\LTwoTestAcc\% against \LThreeXTestAcc\%
+($p = \McnLTwoTestVsLThreeXTestP$). Three convergent diagnostics explain why.
+The alignment compares spans inside an embedding space in which even whole
+summaries fail to separate the candidates, so the one space that does carry
+signal is never entered; the layers err on the same items as the lexical
+baseline; and their combination ceiling falls \OracleShortfall\ points below
+what independent systems would reach.
+\end{abstract}
+\vspace{0.4em}
+\end{@twocolumnfalse}
+]
+
+% ===========================================================================
+% READ THIS BEFORE WRITING A WORD
+%
+% The generated numbers do not say what an earlier reading of the table
+% suggested. Two corrections:
+%
+%  1. NOTHING IS SIGNIFICANT ON DEV. The words-to-meaning jump is +8.00
+%     points but p = 0.10, from 84 discordant pairs. Do not write "the only
+%     significant difference is L1 to L2" -- there is no significant
+%     difference. The correct sentence is that the ablation separates nothing
+%     at n = 200, which is exactly what the power analysis predicted, and
+%     that this is why Section 7 does not rest on accuracy at all.
+%
+%  2. THE UNION CEILING DEPENDS ON THE POOL. \OracleUnion over \PoolSize
+%     layers is not the same quantity as any union figure computed over three
+%     layers earlier in the project. The pool is named in \PoolNames and in
+%     POOL in scripts/export_numbers.py. Quote the pool whenever you quote
+%     the number.
+%
+% Both corrections make the report stronger: the argument moves from "our
+% layer lost by a little" to "accuracy cannot settle this, so here is what
+% can", which is the section you actually have evidence for.
+% ===========================================================================
+
+% ---------------------------------------------------------------------------
+
+% ===========================================================================
+\section{Task and Setup}\label{sec:task}
+% RUBRIC 1 (12 pts). What is the task, what does it demand, what was built.
+% No construction mechanism here -- that is Section 2.
+% ===========================================================================
+This project addresses Track~A of SemEval-2026 Task~4 \citep{hatzel2026}, which
+asks a system to select, from two candidate story summaries, the one more
+similar to an anchor.
+
+The triples are not drawn at random from a corpus. Both candidates are
+retrieved into the anchor's immediate neighbourhood by a narrative encoder, and
+only those triples that two commercial language models disagree on survive to
+be labelled. The released items are therefore, by construction, those on which
+the obvious methods already fail. Because that construction explains almost
+every result reported here, the pipeline is set out in full in
+Section~\ref{sec:data} before any system is described.
+
+The task is a binary forced choice, so the official metric is accuracy and
+chance is 50\%.  % ok
+Each item scores 0 or 1, which means the variance and standard deviation are
+fixed once the accuracy is known and add nothing to it. Uncertainty is
+therefore described with bootstrap and Wilson intervals, and systems are
+compared with paired tests on the same items. On that scale the best official
+system (COGNAC) reached \OfficialBestA\%, the strongest organiser baseline, a
+zero-shot \texttt{GPT-4o-mini} prompt, reached \OfficialBaselineA\%, and the
+estimated human upper bound is \HumanBound\%. The mean of the
+\OfficialRankedA\ ranked Track~A systems, computed here rather than published,
+is \OfficialMeanA\%. Across the \RunCountDev\ development configurations built
+for this project the standard deviation of accuracy is \SpreadDevSD\ points,
+which is about the size of the smallest difference this design can detect.
+
+\paragraph{Setup.} The system is a sequence of layers, each adding exactly one
+representational commitment to the one before it, so any change in accuracy is
+attributable to that single addition and each result --- positive or negative
+--- determines whether the next layer is worth building. All models are
+pretrained and frozen. Parameters are fitted by cross-validation, never on the
+split being scored. Because the power analysis gives a minimum detectable paired
+difference of \PowerPairedLo\ to \PowerPairedHi\ points on test, one
+confirmatory comparison was fixed in advance in a written pre-registration; everything else is
+labelled descriptive or exploratory.
+
+% ===========================================================================
+\section{Data}\label{sec:data}
+% RUBRIC 2 (12 pts). What data, how much, and how it differs from the paper.
+% ===========================================================================
+The official dataset is publicly
+released.\footnote{\raggedright\url{https://github.com/narrative-similarity-task/narrative-similarity-dataset}}
+Track~A provides \SampleN\ sample, \DevN\ development and \TestN\ test triples.
+Summaries are licensed CC BY-SA 4.0 and the labels CC0:  % ok the summaries may be
+reused with attribution and under the same licence, while the annotations carry
+no restriction.
+
+Three properties of the release shaped this project. The first is that no
+training split is provided, so fine-tuning is unavailable; every model used
+here is pretrained and frozen, and all engineering happens in the
+representation rather than in the weights. The second is that the test labels
+are public, which makes the leaderboard reproducible but also makes
+overfitting it a matter of discipline rather than of access --- one team was
+disqualified on exactly this point \citep{hatzel2026}. I therefore reserved the
+split for a single final evaluation, fixed in advance, having used it once
+earlier for untuned baselines while the proposal was written. The third is that
+stories recur across splits, so a development-selected configuration is
+optimistic on test for that reason alone; parameter fitting is consequently
+done by cross-validation within a split.
+
+\subsection{How the triples were built}
+
+
+Summaries come from \emph{Tell Me Again}, restricted to four to eight
+sentences. Each anchor is sampled at random, and both candidates are then drawn
+relative to it with \texttt{story-emb}, an encoder trained so that different
+summaries of the same story land close together. The nearest summary becomes
+the assumed answer, while the distractor is taken from the
+\DistractorPercentile\ similarity percentile, so that both candidates sit inside
+the anchor's neighbourhood rather than merely near it. Two commercial language
+models, which the overview does not name, then judge every triple, and only
+those they disagree on reach human annotation. Of \AnnotTotal\ triples,
+\AnnotAgreed\ had two annotators agree and \AnnotAdjudicated\ were settled by a
+third, leaving \AnnotKept. Those \AnnotKept\ span both tracks, of which Track~A
+receives \TrackAKept: the \SampleN, \DevN\ and \TestN\ splits above.
+
+\subsection{What the annotators recorded}
+
+
+Alongside the binary choice, annotators recorded which of three dimensions
+applied: abstract theme, course of action, and outcomes. Because these are
+independent checkboxes rather than a ranking, an annotator ticks
+\AnnDimsPerJudgment\ of the three on average, and across the \AnnPoolN\
+annotated triples a majority marked theme on \AnnThemePct\%, course of action
+on \AnnActionPct\% and outcomes on \AnnOutcomePct\%.
+
+Agreement on \emph{why} is far weaker than on \emph{which}: Krippendorff's
+$\alpha$ is \AlphaOverall\ overall and between \AlphaPerDimLo\ and
+\AlphaPerDimHi\ per dimension. That caps what any per-dimension diagnostic can
+establish, and it has a further consequence, since a dimension recorded on
+almost every item has no contrast group at all. Theme is marked unanimously on
+\StratThemeMarked\ of \DevN\ development triples and unanimously declined on
+\StratThemeUnmarked, against \StratOutcomeMarked\ and \StratOutcomeUnmarked\
+for outcomes. The most cited dimension is therefore the least usable, and
+outcomes, the least cited, is the only one with strata large enough to
+compare.
+
+Construction and annotation together describe a benchmark on which surface
+methods should not be expected to succeed. Why that is so, rather than merely
+that it is, is the subject of Section~\ref{sec:analysis}.
+
+% ---------------------------------------------------------------------------
+
+\subsection{Reconciliation against the published baseline}
+Before trusting any number from this pipeline I reproduced the organisers'
+lexical baseline. Token-overlap similarity reaches \JaccardTestAcc\% on test
+against the \PublishedJaccardTest\% reported in the overview --- a difference of
+\JaccardGapPts\ points, or \JaccardGapItems\ items out of \TestN.
+
+The cause is tokenization. The implementation here treats the apostrophe as
+word-internal, so possessives and contractions such as \emph{father's} and
+\emph{doesn't} survive as single tokens where a plain
+\texttt{\textbackslash w+} pattern splits them in two. Across the test split
+that produces \JaccardDiffTypes\ token types the two conventions do not share,
+\JaccardDiffApostPct\% of them apostrophe-bearing. Since the overlap score is
+computed over token sets, those differences change which candidate wins on
+\JaccardFlipN\ of the \TestN\ triples: \JaccardFlipFor\ go to the tokenizer
+used here and \JaccardFlipAgainst\ against it, a net gain of
+\JaccardGapItems\ items, which is exactly the gap to be explained. Four
+ordinary alternatives --- word characters, whitespace, alphabetic-only and
+case-sensitive matching --- all reproduce the published
+\PublishedJaccardTest\% exactly. I retain the original tokenizer for
+consistency with the rest of the pipeline, noting that it flatters this
+baseline by \JaccardGapPts\ points. No comparison in this report depends on it,
+and the development result in Section~\ref{sec:analysis} is unaffected, since
+all \JaccardVariantsN\ tokenizations fall below chance there, between
+\JaccardMinVariant\% and \JaccardMaxVariant\%.
+
+% ===========================================================================
+\section{Approach}\label{sec:approach}
+% RUBRIC 3 (22 pts). What was built, why it was expected to work, and enough
+% detail to reimplement. NO ACCURACIES IN THIS SECTION.
+% ===========================================================================
+The overview's catalogue of \OfficialRankedA\ ranked Track~A systems shows that
+nobody used semantic role labelling and nobody used coreference resolution
+\citep{hatzel2026} --- the two standard tools for recovering who acts and who is
+affected --- while the dataset's own annotators record course of action as
+driving a large share of decisions. The hypothesis here is therefore a gap
+rather than a hunch: the field reached for large language models first, and the
+obvious structural approach was never tested. What follows is an incremental
+ablation in which each layer adds one representation, so that each
+contribution is isolated rather than inferred.
+
+\textbf{L0} is the floor: seeded random choice, and token-set Jaccard over
+\texttt{[a-z0-9']+} on lowercased text. \textbf{L1} is TF--IDF cosine
+(scikit-learn, bigrams, \texttt{min\_df}~$=2$, sublinear term frequency,
+English stopwords), which asks how much of the task is simply word overlap; if
+the answer were most of it, nothing structural would be needed. \textbf{L2} is
+sentence embeddings, \texttt{intfloat/e5-base-v2} \citep{e5} with the
+\texttt{"query: "} prefix, encoding whole summaries and ranking by cosine.
+Sentence embeddings should help if the decision turns on paraphrase rather than
+on structure. The organisers publish no Track~A figure for this encoder, so L2
+also supplies a reference point the rest of the stack is measured against.
+
+\textbf{L3} adds characters. Coreference chains from
+\texttt{maverick-mes-litbank} \citep{maverick,jm3} give each story its cast, and
+story similarity is the score of the best one-to-one matching between the two
+casts, computed with the Hungarian algorithm
+(\texttt{scipy.optimize.linear\_sum\_assignment}) over mention-string and
+context similarity. For this to help, similar stories must be populated by
+correspondable casts --- precisely what is being tested.
+
+\textbf{L4} adds roles. For each character the verb lemmas where it is the
+syntactic subject act as an agent proxy and those where it is the object as a
+patient proxy \citep[Ch.~22]{jm3}, and the matching scores shared role--lemma
+pairs instead of mentions. Where L2 scores what the story says and L3 who is in
+it, L4 scores what is done: stories holding the same activities can land
+together no matter who performed them. The proxy is deliberate rather than convenient, because three routes to
+predicate--argument structure were available and none is clean. A trained
+PropBank system would be the standard choice, but no maintained one exists;
+AllenNLP's was archived in 2022. Prompting a language model is the current
+substitute, and it is weak, reaching \SrlArgMatchLLM\% argument match against
+\SrlArgMatchHuman\% for humans \citep{bonn2024}; it would also place inside the
+representation the very class of model the structural hypothesis is meant to be
+tested against. The third route, taken here, reads roles off the dependency
+parse, as \citet{chaturvedi2018} did on this genre. Its cost is that
+dependency relations diverge from semantic roles systematically: \emph{John broke the window} and \emph{the window broke} assign
+the same participant different relations.
+
+Because coreference is expensive and itself error-prone, L3 and L4 each have a
+\textbf{coreference-free variant} in which the cast is built from spaCy
+(\texttt{en\_core\_web\_sm}) noun-chunk heads. Two switches then vary
+independently: an \texttt{actors\_only} filter, which keeps proper nouns and
+nouns appearing as the subject of some verb; and span embedding with
+\texttt{all-MiniLM-L6-v2}, which makes the alignment compare meanings rather
+than strings. All four combinations were run on development data and, with the
+coreference path, isolate the contributions of coreference and of cast purity.
+The configuration carried to the held-out test is the one that scored best
+there: noun-chunk cast, filter on, spans embedded, denoted L3x below.
+
+\textbf{L5} combines the L2, L3 and L4 scores in a weighted sum with weights
+fitted by cross-validation: if the layers represent different things, at least
+one should correct the others' mistakes.
+
+\textbf{L6} is sequential structure. Each summary is cut into five ordered
+segments, each is embedded with \texttt{all-MiniLM-L6-v2}, and the stories are
+compared slot by slot, because a whole-summary vector cannot distinguish a
+story that resolves early from one that resolves late. A second variant relaxes
+the correspondence by dynamic time warping, so the difference between the two
+measures pacing rather than order. Five segments matches the story grammar that
+received weight \GrammarWeight\ in a competing system's learned combination
+here, against \TfidfWeight\ for TF--IDF and \EmbedWeight\ for embeddings.
+\textbf{L6 was implemented but never evaluated}, and
+Section~\ref{sec:ethics} returns to it.
+
+\textbf{L7} decomposes each summary along the three constructs annotators
+recorded about their own decisions --- course of action, outcomes and abstract
+theme --- and scores the candidates construct by construct. If the annotation
+reflects how the judgement is actually made, scoring them separately ought to
+recover it.
+
+\subsection{Harness}
+Every layer implements one interface, \texttt{score(anchor, candidate)},
+selected by Hydra configuration, so comparing two layers changes exactly one
+thing. A single evaluation path serves all of them, giving bootstrap and Wilson
+intervals for one system, McNemar's paired test for two \citep{dietterich},
+cross-validation wherever parameters are fitted, and a guard refusing the test
+split unless unlocked. Every figure here is a macro generated from the stored
+results, with a provenance file recording each source and a lint that fails the
+build on any hand-typed number. This caught three errors that would otherwise have reached the page. Two
+configurations sharing a filename were silently overwriting each other's
+results, so every result file now carries a run-identity hash; a
+TF--IDF vectoriser was being fitted on the split it was scored on, and cost a
+point once corrected; and the baseline discrepancy of Section~\ref{sec:data}
+surfaced only because the audit refused an unreproduced published figure.
+
+
+% ===========================================================================
+\section{Results}\label{sec:results}
+% RUBRIC 4 (17 pts).
+% TODO CUT: this section plus Section 5 must fit roughly 2,000 words together.
+% ===========================================================================
+
+% CLAIM    One jump, then a plateau.
+% BUDGET   ~600 words plus the table. Do not narrate the table row by row;
+%          state the jump, state the plateau, then the paired tests.
+% ---------------------------------------------------------------------------
+
+\begin{table}[htb]
+\centering\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Layer} & \textbf{Acc.} & \textbf{SD} & \textbf{95\% CI} \\  % ok
+\midrule
+L0 \ random                    & \RandomAcc        & \RandomSD        & \RandomCI \\
+L0 \ Jaccard                   & \JaccardAcc       & \JaccardSD       & \JaccardCI \\
+L1 \ TF--IDF cosine            & \TfidfAcc         & \TfidfSD         & \TfidfCI \\
+L2 \ \texttt{e5} embeddings    & \textbf{\LTwoAcc} & \LTwoSD          & \LTwoCI \\
+\midrule
+L3n cast, all nouns            & \LThreeNAcc       & \LThreeNSD       & \LThreeNCI \\
+L3n cast, actors               & \LThreeNActorsAcc & \LThreeNActorsSD & \LThreeNActorsCI \\
+L3x cast, emb., all nouns & \LThreeXAcc       & \LThreeXSD       & \LThreeXCI \\
+L3x cast, emb., actors         & \LThreeXActorsAcc & \LThreeXActorsSD & \LThreeXActorsCI \\
+L3x cast, emb., \texttt{e5} & \LThreeXEFiveAcc  & \LThreeXEFiveSD  & \LThreeXEFiveCI \\
+\midrule
+L4n roles, all nouns           & \LFourNAcc        & \LFourNSD        & \LFourNCI \\
+L4n roles, actors              & \LFourNActorsAcc  & \LFourNActorsSD  & \LFourNActorsCI \\
+L4x roles, emb., all nouns & \LFourXAcc        & \LFourXSD        & \LFourXCI \\
+L4x roles, emb., actors        & \LFourXActorsAcc  & \LFourXActorsSD  & \LFourXActorsCI \\
+\midrule
+L5 \ combination, CV           & \LFiveXAcc        & \LFiveXSD        & \LFiveXCI \\
+\bottomrule
+\end{tabular}
+\caption{Development results, $n=\DevN$. The \textbf{n} variants build the cast
+without coreference; \textbf{x} variants embed the spans. SD is the spread of
+individual items, which for a binary outcome follows from the accuracy, so the
+interval is what describes uncertainty.}
+\label{tab:dev}
+\end{table}
+\subsection{The ablation separates nothing}
+The largest gap anywhere in the stack runs from lexical overlap to sentence
+embeddings, \McnTfidfVsLTwoDiff\ points. Even that one is only suggestive:
+McNemar places it at $p=\McnTfidfVsLTwoP$ over \McnTfidfVsLTwoDisc\ discordant
+pairs. The backbone and the best structural layer are closer still. They
+disagree on \McnLTwoVsLThreeXDisc\ of the \DevN\ items, and those disagreements
+split \McnLTwoVsLThreeXB\ to \McnLTwoVsLThreeXC, so neither layer is ahead of
+the other ($p=\McnLTwoVsLThreeXP$). The same holds for every other pair in the
+table: no comparison on development data reaches significance. This is what the
+power analysis of Section~\ref{sec:task} predicted in advance, and it is a
+property of the sample size rather than a disappointment. At \DevN\ items
+accuracy simply cannot adjudicate between these representations, which is why
+Section~\ref{sec:analysis} does not ask it to.
+
+\subsection{Held-out test result}
+
+% CLAIM    The confirmatory claim, made once, on the frozen configuration.
+% EVIDENCE Fill in after the single test run. Nothing in this section may be
+%          written before that run, and the configuration may not change
+%          after it.
+% BUDGET   ~250 words.
+% ---------------------------------------------------------------------------
+The configuration was frozen at commit \texttt{\FreezeSha}, the layers and the
+single confirmatory comparison fixed in writing beforehand, and the split
+evaluated once. Later commits change analysis and reporting only, never a
+scorer or an evaluation path.
+
+\begin{table}[htb]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Layer} & \textbf{Test} & \textbf{Dev} \\
+\midrule
+L2 \ \texttt{e5} embeddings        & \textbf{\LTwoTestAcc} & \LTwoAcc \\
+L5 \ combination, coref. comp.     & \LFiveCorefTestAcc    & --- \\
+L0 \ Jaccard                       & \JaccardTestAcc       & \JaccardAcc \\
+L5 \ combination, pre-reg. comp.   & \LFiveTestAcc         & \LFiveXAcc \\
+L1 \ TF--IDF                       & \TfidfTestAcc         & \TfidfAcc \\
+L3x character alignment            & \LThreeXTestAcc       & \LThreeXActorsAcc \\
+L0 \ random                        & \RandomTestAcc        & \RandomAcc \\
+\bottomrule
+\end{tabular}
+\caption{The held-out run, $n=\TestN$, beside the development figures. Every
+layer improves on held-out data except character alignment, which is the only
+one that falls.}
+\label{tab:test}
+\end{table}
+
+The confirmatory claim is supported, more strongly than development data
+indicated. The backbone reaches \LTwoTestAcc\% against \LThreeXTestAcc\% for
+the best structural layer, a difference McNemar places at
+$p = \McnLTwoTestVsLThreeXTestP$ over \McnLTwoTestVsLThreeXTestDisc\ discordant
+pairs; the pre-registered combination reaches \LFiveTestAcc\%, also below the
+backbone ($p = \McnLTwoTestVsLFiveTestP$). On development data no layer
+separated from any other, whereas on held-out data the backbone separates from
+both.
+
+The only combination matching the backbone was the one whose fitted weights
+discarded the structural layers entirely (\LFiveCorefWeights).
+
+The pre-specified exploratory measure did not replicate, which is the outcome
+the pre-registration named in advance as falsifying it. Cross-entropy under the
+anchor's unigram model selected the distractor on development data at
+$p=\LexContentCrossEntP$, but favours the correct candidate on
+\LexTestCrossEntPct\% of test triples ($p=\LexTestCrossEntP$), an interval
+containing chance. The lexical reversal therefore belongs to the development
+split alone. One further pattern is visible in Table~\ref{tab:test}: every
+layer scores higher on test than on development except character alignment,
+which falls. Having tied the backbone on development, it is six points behind
+on held-out data, so that parity was itself an artifact.
+
+A deviation from the pre-registration is recorded there and repeated here: it
+named the combination over the embedded-span variants, but the first run used
+the configuration default, which is the coreference set. The pre-registered
+variant was run afterwards and both appear above; neither is withheld.
+
+% ---------------------------------------------------------------------------
+
+% ===========================================================================
+\section{Analysis}\label{sec:analysis}
+% RUBRIC 5 (27 pts). Concrete examples are worth 16 of the 27.
+% ===========================================================================
+Accuracy cannot adjudicate at \DevN\ items, so the question is attacked by
+other means. Two checks bound what any alignment layer could have achieved. The
+first is geometric: placing the anchor at the origin, the chosen candidate is
+the nearer of the two in \GeomTfidfCloserPct\% of triples in TF--IDF space and
+\GeomMiniLMCloserPct\% in MiniLM space, neither separable from a coin flip, and
+reliably nearer only in \texttt{e5} space ($p=\GeomEFiveCloserP$). Since the
+cost matrices of Section~\ref{sec:approach} are built in MiniLM space, the one
+space that carries signal is the one the alignment never enters; and because
+that signal is whole-story, decomposing a summary into spans discards precisely
+what \texttt{e5} encodes. The second check concerns the annotated dimensions:
+scored alone over \CompN\ triples, theme reaches \CompThemeAcc\%, course of
+action \CompActionAcc\% and outcomes \CompOutcomeAcc\%, every interval
+containing chance, while weighting all three reaches only \LSevenAcc\%, below
+the undecomposed backbone at \LTwoAcc\%.
+
+\subsection{Surface overlap is reversed on development data}
+Before any comparative measurement of meaning, one would try the simplest text
+comparison available: the ratio of words the anchor and a candidate share. It
+is not a smart instrument, since synonyms and argument structure are invisible
+to it, but it is worth checking before reaching for anything more elaborate.
+
+On development data the distractor's overlap with the anchor is \emph{higher}
+than the right answer's --- accuracy \JaccardAcc\% with a mean signed margin of
+\JaccardMargin. A distributional measure confirms it: cross-entropy of the
+candidate under the anchor's unigram model favours the correct candidate on only
+\LexContentCrossEntPct\% of triples ($p = \LexContentCrossEntP$).
+
+One triple shows the mechanism. The anchor concerns a biographer investigating
+a fatal test flight, who falls in love with the dead pilot's sister as people
+connected to the case begin to die. The distractor describes a chemist
+betrothed to one sister and in love with another, extorted by agents over his
+secret work; because it shares the sibling, the romance, the state secrets and
+the register, it reaches a Jaccard of \ExampleJaccardWrong. The candidate the
+annotators chose shares far less vocabulary, \ExampleJaccardRight, describing a
+teenager whose family is murdered by foreign agents and who discovers her life
+was a fabrication. What it does share is the \emph{shape} of the anchor, in
+which a protagonist uncovers a concealed truth and is endangered by it. Overlap
+therefore prefers the distractor, by \ExampleJaccardGap.
+
+This is a property of the construction rather than a usable signal. The
+distractors were drawn at the \DistractorPercentile\ percentile of an encoder
+that rewards shared surface, so the effect is built in; but it cannot be
+exploited, because the rule does not hold on unseen data, where the same
+baseline reaches \JaccardTestAcc\%. What overlap cannot see is argument
+structure, and that is what motivates the layers below.
+
+\subsection{Identifying characters more carefully does not help}
+The next intuition is to ask who the story is about, since the matching story
+should share more characters with the anchor than the distractor does. The cast
+extraction tests that premise directly. A noun-chunk head is kept when it is a
+proper noun, or when that noun appears as the subject of a verb somewhere in
+the text, which makes the filter behavioural rather than categorial: it asks
+whether a thing ever acts, not whether it is a person.
+
+On one development anchor, about an organisation advocating for future
+generations, the filter reduces a cast of \ExampleCastFull\ noun heads to
+\ExampleCastActors. The \ExampleCastRemoved\ discarded include
+\texttt{citizen}, \texttt{minister}, \texttt{advocate}, \texttt{glacier} and
+\texttt{airship} --- settings, objects and abstractions. If the alignment were
+matching characters, discarding these should help.
+
+It does not. Restricting the cast costs \McnLThreeNVsLThreeNActorsDiff\ points
+for the character layer, from \LThreeNAcc\% to \LThreeNActorsAcc\%, and
+\McnLFourNVsLFourNActorsDiff\ for the role layer. Replacing the heuristic with
+proper coreference costs more still: those variants reach \LThreeAcc\% and
+\LFourAcc\%, both intervals containing chance. None of the differences is
+significant ($p = \McnLThreeNVsLThreeNActorsP$ and
+$p = \McnLFourNVsLFourNActorsP$), so the argument rests on direction rather
+than on margin. What makes that direction hard to dismiss is its consistency:
+four comparisons, across two independently built layers and two mechanisms for
+identifying characters, all move the same way.
+
+The direction inverts the expected reading. Discarding non-character nouns made
+the system worse, so those nouns were contributing to correct decisions:
+whatever the alignment matched on, it was not characters specifically, and much
+of the cost matrix was scoring settings, objects and topic words --- the same
+vocabulary overlap already shown to be reversed on this split. One caveat: the
+coreference path builds its cast from resolved chains and the coreference-free
+path from noun chunks, so that comparison changes the mechanism of cast
+construction rather than isolating coreference.
+
+\subsection{The structural layers err like the lexical baseline}
+If a structural representation sees something word overlap cannot, it should
+fail on \emph{different} items. Correlating each layer's per-item errors with
+the TF--IDF baseline's over the same \DevN\ triples tests that without
+reference to accuracy at all.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Layer} & \textbf{$\phi$ with TF--IDF} \\
+\midrule
+L2 \quad sentence embeddings alone    & \PhiLTwo \\
+L5 \quad combination, cross-validated & \PhiLFiveX \\
+L3x \quad characters, embedded spans  & \PhiLThreeX \\
+L4x \quad roles, embedded spans       & \PhiLFourX \\
+L3n \quad characters, overlap inside  & \PhiLThreeN \\
+L4n \quad roles, overlap inside       & \PhiLFourN \\
+\bottomrule
+\end{tabular}
+\caption{Correlation between each layer's errors and the lexical baseline's, on
+\DevN\ development triples. Lower means the layer fails on different items,
+which is what a different representation should do.}
+\label{tab:phi}
+\end{table}
+
+Every value is positive and none attributable to chance: shuffling a layer's
+error vector while holding accuracy fixed places $\phi$ between \PhiNullLo\ and
+\PhiNullHi\ ($p=\PhiNullPLTwo$ for the embedding layer, $p=\PhiNullPLThreeX$
+for character alignment). The prediction therefore fails, and it fails in a
+particular direction, since sentence embeddings alone are the \emph{least}
+lexically correlated layer at \PhiLTwo\ and every structural layer sits above
+them. The ordering tracks how much surface matching remains inside each one.
+The combination is the clearest case: at \PhiLFiveX\ it sits above the backbone
+it was built on, so adding structure moved its errors \emph{closer} to the
+lexical baseline. Shared item difficulty would raise every coefficient equally
+and so cannot explain why they differ, which is why the ordering is the finding
+rather than the magnitudes.
+
+\subsection{The combination ceiling is far below independence}
+Layers that fail together cannot be combined into something better than
+themselves. The union, the proportion of items on which at least one layer is
+correct, is not itself a system, since selecting the right layer per item would
+presume knowing the answer; but it is the ceiling for every combination rule. Over the \PoolSize\ layers pooled here at least one is
+correct on \OracleUnion\% of development items, where independence at the same
+accuracies would predict \OracleIndep\%. That shortfall of \OracleShortfall\
+points is the error correlation above, expressed in accuracy. Both realised
+combinations land \emph{below} the backbone, so combining did not merely fail
+to help but cost.
+
+% ===========================================================================
+\section{Ethics and Limitations}\label{sec:ethics}
+% RUBRIC 6 (10 pts).
+% ===========================================================================
+\paragraph{Licensing.} The summaries are licensed CC BY-SA 4.0, the labels  % ok
+CC0. Summaries may therefore be redistributed with attribution and under the
+same licence, which this report observes in quoting them, while the labels
+carry no restriction. The underlying texts are encyclopaedic plot summaries of
+published films and novels, so the corpus remains derivative of copyrighted
+works even though the summaries themselves are openly licensed; the examples in
+Section~\ref{sec:analysis} are accordingly excerpted for analysis rather than
+reproduced. Finally, the dataset README asks that a canary string accompany any
+reproduction of samples with their labels, and the script that generates the
+examples below emits it alongside them.
+
+\paragraph{Test-label discipline.} The gold test labels are public, so using
+them is a matter of restraint rather than of access, and one team in this
+shared task was disqualified for failing that restraint \citep{hatzel2026}.
+Three mechanisms were used in place of good intentions. The evaluation code
+refuses the test split unless an environment flag is set. The confirmatory
+comparison, the layers to run and the exploratory measures were all written
+down before the split was touched. And deviations found afterwards were
+recorded in a dated section of that document rather than by editing it. The
+reconciliation in Section~\ref{sec:data} was the one additional computation
+performed on test, and it fitted and selected nothing.
+
+\paragraph{Scope.} The low per-dimension agreement in Section~\ref{sec:data} is
+a property of the task rather than evidence of careless annotation, since
+people who agree on which story is closer can reasonably disagree about why.
+The data is English only and drawn from a largely Western film and novel canon,
+so a claim here about ``narrative similarity'' is a claim about that canon.
+That matters for the interest motivating this project --- structural
+representations for low-resource storytelling --- since a negative result on
+compressed English summaries is not decisive for genres where structure is
+explicit.
+
+\paragraph{Use of generative AI.} I used Claude throughout this project. It wrote most of the supporting code ---
+the evaluation harness additions, the audit script, and the figure and
+provenance tooling --- proposed several of the diagnostic measurements, and
+drafted report prose from my explanations, which I reviewed and revised. The
+boundaries were set deliberately: the research question, the layer design,
+every experiment run and every decision about what could honestly be claimed
+were mine; no figure here comes from a model rather than from a stored result;
+and the errors it introduced, which I caught, are part of why the verification
+machinery of Section~\ref{sec:approach} exists.
+
+\paragraph{Limitations.} The paired test on \TestN\ items detects
+\PowerPairedLo\ to \PowerPairedHi\ points, so a small true effect would be
+invisible, and stratified contrasts need \PowerStrataMDE\ points and are
+therefore description only. Dependency relations proxy semantic roles and
+diverge from them systematically, and the coreference comparison is confounded
+with cast construction, since one path uses chains and the other noun chunks.
+L0 and L1 measure surface-form overlap rather than lexical semantics, and the
+stopword list in the distributional analysis is ad hoc. Stories recur across
+splits, and only one encoder family and one language were used.
+
+Two gaps deserve naming rather than burying. The first is that \textbf{L6 was
+never evaluated}, even though it targets the one structural signal with a
+positive published result on this task; it also inherits a mismatch, since its
+segment count came from a \emph{functional} story grammar but is implemented as
+\emph{positional} slicing, which on summaries this short means a segment of
+about one sentence and \SegPadPct\% of summaries padded by a repetition. The
+second is that, measured against the proposal, L7 and the geometric analysis
+were unplanned additions and a promised hand-audit of coreference outputs did
+not happen.
+
+\paragraph{Conclusion.} Structure did not help, and the reason is measurable:
+the alignment compares spans inside a space where even whole summaries fail to
+separate the candidates, so decomposing a summary discards the signal the
+encoder carries. The next step is to score that decomposition rather than match
+it.
+
+\clearpage
+\bibliographystyle{acl_natbib}
+\bibliography{custom}
+
+\end{document}
