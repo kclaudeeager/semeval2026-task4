@@ -525,7 +525,9 @@ def build(runs: list[Run]) -> tuple[list[str], list[str]]:
             ("JaccardFlipFor", str(tk["flips"]["current_right"])),
             ("JaccardFlipAgainst", str(tk["flips"]["current_wrong"])),
             ("JaccardDiffTypes", str(tk["vocabulary"]["types"])),
-            ("JaccardDiffApostPct", f"{tk['vocabulary']['apostrophe_pct']:.1f}"),
+            ("JaccardDiffApostPct",
+             f"{tk['vocabulary'].get('apostrophe_pct_types', tk['vocabulary']['apostrophe_pct']):.1f}"),
+            ("JaccardDiffApostN", str(tk["vocabulary"].get("apostrophe_types", 0))),
             ("JaccardVariantsMatching", str(len(tk["matching_variants"]))),
         ):
             lines.append(macro(mn, val))

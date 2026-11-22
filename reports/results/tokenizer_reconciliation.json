@@ -132,6 +132,9 @@
     "types": 930,
     "occurrences": 1917,
     "apostrophe_occurrences": 1432,
+    "apostrophe_types": 716,
+    "apostrophe_pct_occurrences": 74.7,
+    "apostrophe_pct_types": 77.0,
     "apostrophe_pct": 74.7,
     "most_common": [
       [

@@ -223,23 +223,23 @@ against the \PublishedJaccardTest\% reported in the overview --- a difference of
 \JaccardGapPts\ points, or \JaccardGapItems\ items out of \TestN.
 
 The cause is tokenization. The pattern used here, \texttt{[a-z0-9']+}, treats
-the apostrophe as part of the word, so \emph{father's} and \emph{doesn't} are
+the apostrophe as part of the word, so \emph{father's} and \emph{doesn't} stay
 single tokens; a plain \texttt{\textbackslash w+} pattern breaks them in two.
-Across the test split, \JaccardDiffTypes\ token types exist under the first
-convention that do not exist under the second, and \JaccardDiffApostPct\% of
-those carry an apostrophe. Because the score compares token sets, the two conventions
-disagree about which candidate is closer on \JaccardFlipN\ of the \TestN\
-triples. On \JaccardFlipFor\ of those the pattern used here picks
-the candidate the annotators chose and on \JaccardFlipAgainst\ the plain
-pattern does, so the pattern used here finishes \JaccardGapItems\ items ahead
---- \JaccardGapPts\ points on \TestN\ triples, which is the whole of the gap.
-Four ordinary alternatives, whitespace splitting among them, reproduce the
-published \PublishedJaccardTest\% exactly. I retain the original tokenizer for consistency with
-the rest of the pipeline, noting that it flatters this baseline. No comparison
-here depends on it, and the
-development result of Section~\ref{sec:analysis} is unaffected: all
-\JaccardVariantsN\ tokenizations fall below chance there, between
-\JaccardMinVariant\% and \JaccardMaxVariant\%.
+Across the test split there are \JaccardDiffTypes\ token types the first
+pattern produces and the second never does, \JaccardDiffApostPct\% of them
+apostrophe-bearing and the rest mostly fragments of accented words. Because the
+score compares token sets, the two patterns pick different candidates on
+\JaccardFlipN\ of the \TestN\ triples: on \JaccardFlipFor\ the pattern used
+here picks the candidate the annotators chose, and on \JaccardFlipAgainst\ the
+plain pattern does. That leaves the pattern used here \JaccardGapItems\ items
+ahead --- \JaccardGapPts\ points on \TestN\ triples, which is the whole of the
+gap. Four ordinary alternatives reproduce the published
+\PublishedJaccardTest\% exactly. I retain the original tokenizer for
+consistency with the rest of the pipeline, noting that it flatters this
+baseline. No comparison here depends on it, and the development result of
+Section~\ref{sec:analysis} is unaffected: all \JaccardVariantsN\ tokenizations
+fall below chance there, between \JaccardMinVariant\% and
+\JaccardMaxVariant\%.
 
 % ===========================================================================
 \section{Approach}\label{sec:approach}

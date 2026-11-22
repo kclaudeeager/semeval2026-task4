@@ -437,7 +437,8 @@ number with no recorded source: fix it before citing it.
 | `\JaccardFlipFor` | 12 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
 | `\JaccardFlipAgainst` | 5 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
 | `\JaccardDiffTypes` | 930 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
-| `\JaccardDiffApostPct` | 74.7 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
+| `\JaccardDiffApostPct` | 77.0 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
+| `\JaccardDiffApostN` | 716 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
 | `\JaccardVariantsMatching` | 4 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the L0 token-overlap baseline on test under 10 tokenizations, against the published 56.25\% |
 | `\JaccardMinVariant` | 44.00 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the same 10 tokenizations on dev, showing the below-chance result is not an artifact of the choice |
 | `\JaccardMaxVariant` | 47.50 | tokenizer reconciliation (generated) | scripts/tokenizer_reconciliation.py: the same 10 tokenizations on dev, showing the below-chance result is not an artifact of the choice |
@@ -540,6 +541,6 @@ number with no recorded source: fix it before citing it.
 | `\ExampleJaccardGap` | 0.0752 | notebook-derived figures (report/facts.json) | ExampleJaccardGap: scripts/examples.py, development triple 160: Jaccard against the anchor over the L0 tokenizer (margin by which overlap prefers the distractor) |
 | `\ExampleCastRemoved` | 38 | notebook-derived figures (report/facts.json) | ExampleCastRemoved: scripts/examples.py, development triple 0: noun heads discarded by the actors-only filter |
 | `\TrackAKept` | 639 | notebook-derived figures (report/facts.json) | TrackAKept: Hatzel et al. 2026: the 1,039 kept triples span both tracks; Track A receives 39 sample + 200 dev + 400 test |
-| `\MacroCount` | 534 | notebook-derived figures (report/facts.json) | MacroCount: counted here, the number of macros in this file |
+| `\MacroCount` | 535 | notebook-derived figures (report/facts.json) | MacroCount: counted here, the number of macros in this file |
 
-534 macros, 0 without a source.
+535 macros, 0 without a source.

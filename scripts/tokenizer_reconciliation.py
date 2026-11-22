@@ -108,10 +108,16 @@ def vocabulary_difference(triples) -> dict:
                 counts[w] += 1
     total = sum(counts.values())
     apost = sum(n for w, n in counts.items() if "'" in w)
+    apost_types = sum(1 for w in counts if "'" in w)
+    # Types and occurrences give different shares, so both are recorded and
+    # named: quoting one against the other's denominator is the easy mistake.
     return {
         "types": len(counts),
         "occurrences": total,
         "apostrophe_occurrences": apost,
+        "apostrophe_types": apost_types,
+        "apostrophe_pct_occurrences": round(100.0 * apost / total, 1) if total else 0.0,
+        "apostrophe_pct_types": round(100.0 * apost_types / len(counts), 1) if counts else 0.0,
         "apostrophe_pct": round(100.0 * apost / total, 1) if total else 0.0,
         "most_common": counts.most_common(12),
     }
