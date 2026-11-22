@@ -75,10 +75,9 @@ split the embedding backbone leads the best structural layer,
 \LTwoTestAcc\% against \LThreeXTestAcc\%
 ($p = \McnLTwoTestVsLThreeXTestP$). Three convergent diagnostics explain why.
 The alignment compares spans inside an embedding space in which even whole
-summaries fail to separate the candidates, so the one space that does carry
-signal is never entered; the layers err on the same items as the lexical
-baseline; and their combination ceiling falls \OracleShortfall\ points below
-what independent systems would reach.
+summaries fail to separate the candidates; the layers err on the same items as
+the lexical baseline; and their combination ceiling falls \OracleShortfall\
+points below what independent systems would reach.
 \end{abstract}
 \vspace{0.4em}
 \end{@twocolumnfalse}
@@ -407,9 +406,10 @@ Section~\ref{sec:analysis} does not ask it to.
 %          after it.
 % BUDGET   ~250 words.
 % ---------------------------------------------------------------------------
-The configuration was frozen at commit \texttt{\FreezeSha}, the layers and the
-single confirmatory comparison fixed in writing beforehand, and the split
-evaluated once. Later commits change analysis and reporting only, never a
+The configuration was frozen at commit \texttt{\FreezeSha} in the public
+repository,\footnote{\href{https://github.com/kclaudeeager/semeval2026-task4}{github.com/kclaudeeager/semeval2026-task4}}
+the layers and the single confirmatory comparison fixed beforehand, and the
+split evaluated once. Later commits change analysis and reporting only, never a
 scorer or an evaluation path.
 
 \begin{table}[htb]
@@ -531,14 +531,13 @@ matching characters, discarding these should help.
 
 It does not. Restricting the cast costs \McnLThreeNVsLThreeNActorsDiff\ points
 for the character layer, from \LThreeNAcc\% to \LThreeNActorsAcc\%, and
-\McnLFourNVsLFourNActorsDiff\ for the role layer. Replacing the heuristic with
-proper coreference costs more still: those variants reach \LThreeAcc\% and
-\LFourAcc\%, both intervals containing chance. None of the differences is
-significant ($p = \McnLThreeNVsLThreeNActorsP$ and
-$p = \McnLFourNVsLFourNActorsP$), so the argument rests on direction rather
-than on margin. What makes that direction hard to dismiss is its consistency:
-four comparisons, across two independently built layers and two mechanisms for
-identifying characters, all move the same way.
+\McnLFourNVsLFourNActorsDiff\ for the role layer. Proper coreference costs more still: those
+variants reach \LThreeAcc\% and \LFourAcc\%, both intervals containing
+chance. None of the differences is significant
+($p = \McnLThreeNVsLThreeNActorsP$, $p = \McnLFourNVsLFourNActorsP$), so the
+argument rests on direction rather than margin. What makes that direction hard to dismiss is its
+consistency: four comparisons, across two independently built layers and two
+mechanisms for identifying characters, all move the same way.
 
 The direction inverts the expected reading. Discarding non-character nouns made
 the system worse, so those nouns were contributing to correct decisions:
@@ -593,11 +592,10 @@ Layers that fail together cannot be combined into something better than
 themselves. The union, the proportion of items on which at least one layer is
 correct, is not itself a system, since selecting the right layer per item would
 presume knowing the answer; but it is the ceiling for every combination rule. Over the \PoolSize\ layers pooled here at least one is
-correct on \OracleUnion\% of development items, where independence at the same
-accuracies would predict \OracleIndep\%. That shortfall of \OracleShortfall\
-points is the error correlation above, expressed in accuracy. Both realised
-combinations land \emph{below} the backbone, so combining did not merely fail
-to help but cost.
+correct on \OracleUnion\% of development items, where independence would
+predict \OracleIndep\%. That shortfall of \OracleShortfall\ points is the
+error correlation above, expressed in accuracy. Both realised combinations land
+\emph{below} the backbone, so combining did not merely fail to help but cost.
 
 % ===========================================================================
 \section{Ethics and Limitations}\label{sec:ethics}
