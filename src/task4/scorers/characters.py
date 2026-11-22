@@ -10,7 +10,6 @@ from dataclasses import dataclass, field
 
 from ..registry import register
 from .base import Scorer
-from .lexical import tokenize
 
 
 @contextlib.contextmanager

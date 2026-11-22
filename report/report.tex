@@ -222,23 +222,24 @@ lexical baseline. Token-overlap similarity reaches \JaccardTestAcc\% on test
 against the \PublishedJaccardTest\% reported in the overview --- a difference of
 \JaccardGapPts\ points, or \JaccardGapItems\ items out of \TestN.
 
-The cause is tokenization. The pattern used here, \texttt{[a-z0-9']+}, treats
-the apostrophe as part of the word, so \emph{father's} and \emph{doesn't} stay
-single tokens; a plain \texttt{\textbackslash w+} pattern breaks them in two.
+The cause is tokenization. The pattern used here,
+\texttt{[a-z0-9']+}, keeps the apostrophe inside the word, so \emph{father's}
+and \emph{doesn't} stay single tokens; a plain \texttt{\textbackslash w+}
+pattern breaks them in two.
 Across the test split there are \JaccardDiffTypes\ token types the first
-pattern produces and the second never does, \JaccardDiffApostPct\% of them
-apostrophe-bearing and the rest mostly fragments of accented words. Because the
-score compares token sets, the two patterns pick different candidates on
-\JaccardFlipN\ of the \TestN\ triples: on \JaccardFlipFor\ the pattern used
-here picks the candidate the annotators chose, and on \JaccardFlipAgainst\ the
-plain pattern does. That leaves the pattern used here \JaccardGapItems\ items
-ahead --- \JaccardGapPts\ points on \TestN\ triples, which is the whole of the
-gap. Four ordinary alternatives reproduce the published
-\PublishedJaccardTest\% exactly. I retain the original tokenizer for
-consistency with the rest of the pipeline, noting that it flatters this
-baseline. No comparison here depends on it, and the development result of
-Section~\ref{sec:analysis} is unaffected: all \JaccardVariantsN\ tokenizations
-fall below chance there, between \JaccardMinVariant\% and
+produces and the second never does, \JaccardDiffApostPct\% of them
+apostrophe-bearing and the rest mostly fragments of accented words. Because the score compares token
+sets, the two pick different candidates on \JaccardFlipN\ of the \TestN\
+triples: on \JaccardFlipFor\ the pattern used here chooses what the annotators
+chose, on \JaccardFlipAgainst\ the plain one does. That leaves the pattern used
+here \JaccardGapItems\ items ahead --- \JaccardGapPts\ points on \TestN\
+triples, the whole of the gap. Four ordinary alternatives reproduce the published
+\PublishedJaccardTest\% exactly. I retain the original pattern, noting that it
+flatters this baseline. Nothing else depends on it: the L0 baseline is the only
+layer that uses this pattern, L1 using scikit-learn's tokenizer and every later
+layer spaCy tokens or a subword vocabulary. The development result of
+Section~\ref{sec:analysis} is also unaffected, all \JaccardVariantsN\
+tokenizations falling below chance, between \JaccardMinVariant\% and
 \JaccardMaxVariant\%.
 
 % ===========================================================================
@@ -576,15 +577,14 @@ which is what a different representation should do.}
 Every value is positive and none attributable to chance: shuffling a layer's
 error vector while holding accuracy fixed places $\phi$ between \PhiNullLo\ and
 \PhiNullHi\ ($p=\PhiNullPLTwo$ for the embedding layer, $p=\PhiNullPLThreeX$
-for character alignment). The prediction therefore fails, and it fails in a
-particular direction, since sentence embeddings alone are the \emph{least}
-lexically correlated layer at \PhiLTwo\ and every structural layer sits above
-them. The ordering tracks how much surface matching remains inside each one.
-The combination is the clearest case: at \PhiLFiveX\ it sits above the backbone
-it was built on, so adding structure moved its errors \emph{closer} to the
-lexical baseline. Shared item difficulty would raise every coefficient equally
-and so cannot explain why they differ, which is why the ordering is the finding
-rather than the magnitudes.
+for character alignment). The prediction therefore fails, and in a particular
+direction, since sentence embeddings alone are the \emph{least} lexically
+correlated layer at \PhiLTwo\ and every structural layer sits above them. The
+ordering tracks how much surface matching remains inside each. The combination
+is clearest: at \PhiLFiveX\ it sits above the backbone it was built on, so
+adding structure moved its errors \emph{closer} to the lexical baseline. Shared
+item difficulty would raise every coefficient equally and cannot explain why
+they differ, so the ordering is the finding, not the magnitudes.
 
 \subsection{The combination ceiling is far below independence}
 Layers that fail together cannot be combined into something better than
