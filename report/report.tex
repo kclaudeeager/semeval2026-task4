@@ -161,18 +161,17 @@ Summaries are licensed CC BY-SA 4.0 and the labels CC0:  % ok the summaries may 
 reused with attribution and under the same licence, while the annotations carry
 no restriction.
 
-Three properties of the release shaped this project. The first is that no
-training split is provided, so fine-tuning is unavailable; every model used
-here is pretrained and frozen, and all engineering happens in the
-representation rather than in the weights. The second is that the test labels
+Three properties of the release shaped this project. The first is that no training
+split is provided, so fine-tuning is unavailable: every model is pretrained and
+frozen, and all engineering happens in the representation, not the weights. The second is that the test labels
 are public, which makes the leaderboard reproducible but also makes
 overfitting it a matter of discipline rather than of access --- one team was
 disqualified on exactly this point \citep{hatzel2026}. I therefore reserved the
 split for a single final evaluation, fixed in advance, having used it once
-earlier for untuned baselines while the proposal was written. The third is that
-stories recur across splits, so a development-selected configuration is
-optimistic on test for that reason alone; parameter fitting is consequently
-done by cross-validation within a split.
+earlier for untuned baselines while the proposal was written. The third is that stories
+recur across splits, so a development-selected configuration is optimistic on
+test for that reason alone; fitting is therefore cross-validated within a
+split.
 
 \subsection{How the triples were built}
 
@@ -223,23 +222,23 @@ lexical baseline. Token-overlap similarity reaches \JaccardTestAcc\% on test
 against the \PublishedJaccardTest\% reported in the overview --- a difference of
 \JaccardGapPts\ points, or \JaccardGapItems\ items out of \TestN.
 
-The cause is tokenization. The implementation here treats the apostrophe as
-word-internal, so possessives and contractions such as \emph{father's} and
-\emph{doesn't} survive as single tokens where a plain
-\texttt{\textbackslash w+} pattern splits them in two. Across the test split
-that produces \JaccardDiffTypes\ token types the two conventions do not share,
-\JaccardDiffApostPct\% of them apostrophe-bearing. Since the overlap score is
-computed over token sets, those differences change which candidate wins on
-\JaccardFlipN\ of the \TestN\ triples: \JaccardFlipFor\ go to the tokenizer
-used here and \JaccardFlipAgainst\ against it, a net gain of
-\JaccardGapItems\ items, which is exactly the gap to be explained. Four
-ordinary alternatives --- word characters, whitespace, alphabetic-only and
-case-sensitive matching --- all reproduce the published
-\PublishedJaccardTest\% exactly. I retain the original tokenizer for
-consistency with the rest of the pipeline, noting that it flatters this
-baseline by \JaccardGapPts\ points. No comparison in this report depends on it,
-and the development result in Section~\ref{sec:analysis} is unaffected, since
-all \JaccardVariantsN\ tokenizations fall below chance there, between
+The cause is tokenization. The pattern used here, \texttt{[a-z0-9']+}, treats
+the apostrophe as part of the word, so \emph{father's} and \emph{doesn't} are
+single tokens; a plain \texttt{\textbackslash w+} pattern breaks them in two.
+Across the test split, \JaccardDiffTypes\ token types exist under the first
+convention that do not exist under the second, and \JaccardDiffApostPct\% of
+those carry an apostrophe. Because the score compares token sets, the two conventions
+disagree about which candidate is closer on \JaccardFlipN\ of the \TestN\
+triples. On \JaccardFlipFor\ of those the pattern used here picks
+the candidate the annotators chose and on \JaccardFlipAgainst\ the plain
+pattern does, so the pattern used here finishes \JaccardGapItems\ items ahead
+--- \JaccardGapPts\ points on \TestN\ triples, which is the whole of the gap.
+Four ordinary alternatives, whitespace splitting among them, reproduce the
+published \PublishedJaccardTest\% exactly. I retain the original tokenizer for consistency with
+the rest of the pipeline, noting that it flatters this baseline. No comparison
+here depends on it, and the
+development result of Section~\ref{sec:analysis} is unaffected: all
+\JaccardVariantsN\ tokenizations fall below chance there, between
 \JaccardMinVariant\% and \JaccardMaxVariant\%.
 
 % ===========================================================================
@@ -628,10 +627,9 @@ a property of the task rather than evidence of careless annotation, since
 people who agree on which story is closer can reasonably disagree about why.
 The data is English only and drawn from a largely Western film and novel canon,
 so a claim here about ``narrative similarity'' is a claim about that canon.
-That matters for the interest motivating this project --- structural
-representations for low-resource storytelling --- since a negative result on
-compressed English summaries is not decisive for genres where structure is
-explicit.
+That matters for the interest motivating this project, structural
+representations for low-resource storytelling: a negative result on compressed
+English summaries is not decisive for genres where structure is explicit.
 
 \paragraph{Use of generative AI.} I used Claude throughout this project. It wrote most of the supporting code ---
 the evaluation harness additions, the audit script, and the figure and
@@ -666,8 +664,7 @@ not happen.
 \paragraph{Conclusion.} Structure did not help, and the reason is measurable:
 the alignment compares spans inside a space where even whole summaries fail to
 separate the candidates, so decomposing a summary discards the signal the
-encoder carries. The next step is to score that decomposition rather than match
-it.
+encoder carries. The next step is to score that decomposition, not match it.
 
 \clearpage
 \bibliographystyle{acl_natbib}
