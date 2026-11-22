@@ -605,11 +605,11 @@ CC0. Summaries may therefore be redistributed with attribution and under the
 same licence, which this report observes in quoting them, while the labels
 carry no restriction. The underlying texts are encyclopaedic plot summaries of
 published films and novels, so the corpus remains derivative of copyrighted
-works even though the summaries themselves are openly licensed; the examples in
-Section~\ref{sec:analysis} are accordingly excerpted for analysis rather than
-reproduced. Finally, the dataset README asks that a canary string accompany any
-reproduction of samples with their labels, and the script that generates the
-examples below emits it alongside them.
+works even though the summaries are openly licensed; the examples in
+Section~\ref{sec:analysis} are accordingly excerpted rather than reproduced.
+The dataset README asks that a canary string accompany any reproduction of
+samples with their labels, and the script that generates those examples emits
+it alongside them.
 
 \paragraph{Test-label discipline.} The gold test labels are public, so using
 them is a matter of restraint rather than of access, and one team in this
@@ -648,7 +648,8 @@ therefore description only. Dependency relations proxy semantic roles and
 diverge from them systematically, and the coreference comparison is confounded
 with cast construction, since one path uses chains and the other noun chunks.
 L0 and L1 measure surface-form overlap rather than lexical semantics, and the
-stopword list in the distributional analysis is ad hoc. Stories recur across
+distributional analysis uses both an ad hoc stopword list and a tokenizer that
+differs from L0's. Stories recur across
 splits, and only one encoder family and one language were used.
 
 Two gaps deserve naming rather than burying. The first is that \textbf{L6 was
